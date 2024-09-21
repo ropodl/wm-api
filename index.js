@@ -9,15 +9,13 @@ import all_routes from "express-list-endpoints";
 import "express-async-errors";
 
 import { errorHandler, handleNotFound } from "./middleware/errorHandler.js";
-import routes from './routes';
+import routes from './routes/index.js';
 
-import dotenv from "dotenv"
-dotenv.config();
+import "dotenv/config"
+
 import "./config/db.js"
 
 const app = express();
-
-
 
 app.use("/uploads/", express.static('uploads'));
 app.use(cors());
@@ -42,11 +40,11 @@ app.get("/get-all-routes", (req, res) => {
 app.use("/*", handleNotFound);
 app.use(errorHandler);
 // Host app
-if (process.env.app_port) {
-    app.listen(process.env.app_port, (error) => {
+if (process.env.APP_PORT) {
+    app.listen(process.env.APP_PORT, (error) => {
         if (error) console.log(error)
-        console.log(`localhost:${process.env.app_port}`)
+        console.log(`localhost:${process.env.APP_PORT}`)
     })
 }
 
-module.exports = app;
+export default app;

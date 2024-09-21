@@ -1,4 +1,4 @@
-import { sendError } from "../utils/error";
+import { sendError } from "../utils/error.js";
 
 export function errorHandler(err, req, res, next) {
   console.log("error:", err);
