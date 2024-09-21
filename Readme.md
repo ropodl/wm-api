@@ -1,0 +1,9 @@
+-> Clone repo
+-> cd into the directory
+-> npm install
+-> copy .env.sample to .env
+-> install mongodb
+-> install mongodb compass
+-> create a new database in mongodb
+-> added connection string to env
+-> and run npm run dev

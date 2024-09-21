@@ -5,12 +5,10 @@ import morgan from "morgan";
 import cors from "cors";
 import compression from "compression";
 import all_routes from "express-list-endpoints";
-
 import "express-async-errors";
 
 import { errorHandler, handleNotFound } from "./middleware/errorHandler.js";
 import routes from './routes/index.js';
-
 import "dotenv/config"
 
 import "./config/db.js"
