@@ -11,7 +11,6 @@ const mongoOptions = {
 
 export async function connect(id) {
   let url = process.env.DB_ADDRESS + id;
-  console.log(url,"test us");
   return new Promise(async (resolve) => {
     const connection = await mongoose
       .createConnection(url, mongoOptions)
