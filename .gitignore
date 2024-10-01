@@ -4,4 +4,3 @@ coverage/
 .env
 *.log
 uploads/
-package-lock.json

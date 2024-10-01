@@ -1,4 +1,3 @@
-// const express = require('express');
 import express from "express"
 import helmet from "helmet";
 import morgan from "morgan";
@@ -11,7 +10,7 @@ import { errorHandler, handleNotFound } from "./middleware/errorHandler.js";
 import routes from './routes/index.js';
 import "dotenv/config"
 
-import "./config/db.js"
+// import "./config/db.js"
 
 const app = express();
 
@@ -26,9 +25,6 @@ app.use(compression({ level: 9 }))
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 app.use('/api/v1', routes);
-app.get("/api/v1/test", (req, res) => {
-    res.json("test")
-});
 app.get("/get-all-routes", (req, res) => {
     console.log(all_routes(app))
     res.json("Open console to see all routes");
