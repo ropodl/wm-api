@@ -9,8 +9,7 @@ const mongoOptions = {
   socketTimeoutMS: 30000,
 };
 
-export async function connect(id) {
-  let url = process.env.DB_ADDRESS + id;
+export async function connect(url) {
   return new Promise(async (resolve) => {
     const connection = await mongoose
       .createConnection(url, mongoOptions)

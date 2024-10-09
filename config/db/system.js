@@ -10,10 +10,10 @@ const mongoOptions = {
 };
 
 mongoose
-  .connect(process.env.DB_ADDRESS+"system")
+  .connect(`${process.env.DB_ADDRESS}system`, mongoOptions)
   .then(() => {
-    console.log("DB is connected");
+    console.log("System DB is connected");
   })
   .catch((err) => {
-    console.log("DB connection is failed", err);
+    console.log("System DB connection is failed", err);
   });

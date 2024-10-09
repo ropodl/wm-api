@@ -3,8 +3,7 @@ import TenantSchema from "../../model/system/tenant.js";
 import { getTenantDB } from "../../utils/tenant.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import { createConfig } from "../../utils/config.js"
-
+import { createConfig } from "../../utils/config.js";
 
 const router = Router();
 
@@ -17,6 +16,7 @@ router.post("/tenant", async (req, res) => {
   const { name, sub, email } = req.body;
   const tenant = new TenantSchema({ name: `tenant_${name}`, sub });
   const { id, name: dbName } = await tenant.save();
+  console.log(tenant, " this is a tenant test");
 
   const userSchema = mongoose.Schema({
     name: { type: String, trim: true, required: true },
@@ -105,7 +105,7 @@ router.post("/tenant", async (req, res) => {
 #       }
 #}`;
 
-  await createConfig(id,config)
+  createConfig(id, config);
 
   res.json({
     name,

@@ -4,8 +4,8 @@ import application from "./application/index.js"
 
 const router = express.Router()
 
-router.use("/system", system)
-router.use("/", application)
+router.use("/system", system);
+router.use("/", application);
 
 router.use("version-check/", (req,res)=>{
     res.json({
