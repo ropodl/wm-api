@@ -10,8 +10,6 @@ import { errorHandler, handleNotFound } from "./middleware/errorHandler.js";
 import routes from './routes/index.js';
 import "dotenv/config"
 
-// import "./config/db.js"
-
 const app = express();
 
 app.use("/uploads/", express.static('uploads'));
