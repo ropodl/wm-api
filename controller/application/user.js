@@ -4,17 +4,29 @@ import { sendError } from "../../utils/error.js";
 import { getTenantDB } from "../../utils/tenant.js";
 
 export async function create(req, res) {
-  const { name, email, password, role } = req.body;
+  const { name, email, password, role, interests } = req.body;
   const { tenant_id } = req.headers;
 
   const tenantdb = await getTenantDB(tenant_id);
-  const tenantUser = tenantdb.model("user", UserSchema);
+  const tenantUser = tenantdb.model("users", UserSchema);
+
+  UserSchema.pre("save", function (next) {
+    if (this.isModified("password")) {
+      this.password = bcrypt.hash(this.password, 14);
+    }
+    next();
+  });
+  
+  UserSchema.methods.comparePassword = async function (password) {
+    const result = await bcrypt.compare(password, this.password);
+    return result;
+  };
 
   const oldUser = await tenantUser.findOne({ email });
   if (oldUser)
     return sendError(res, "User with given email already exists.", 400);
 
-  const user = new tenantUser({ name, email, password, role });
+  const user = new tenantUser({ name, email, password, role, interests });
   await user.save();
 
   res.status(200).json({
