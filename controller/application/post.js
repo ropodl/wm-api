@@ -23,7 +23,7 @@ export async function create(req, res) {
     name: file.filename,
   };
 
-  const slug = await slugify(title, tenantPost);
+  const slug = await slugify(title, tenantPost, res);
 
   const post = new tenantPost({
     title,

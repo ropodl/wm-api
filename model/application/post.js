@@ -13,6 +13,7 @@ const PostSchema = mongoose.Schema(
     ],
   },
   {
+    name: "post",
     timestamps: true,
   }
 );

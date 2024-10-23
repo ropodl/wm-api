@@ -15,6 +15,7 @@ const UserSchema = mongoose.Schema(
     interests: { type: mongoose.Schema.Types.ObjectId, ref: "interests" },
   },
   {
+    name: "user",
     timestamps: true,
   },
 );

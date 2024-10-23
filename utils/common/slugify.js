@@ -1,4 +1,6 @@
-export async function slugify(string, schema) {
+import { sendError } from "../error.js";
+
+export async function slugify(string, schema, res) {
   // Convert the input string to lowercase.
   string = string.toLowerCase();
 
@@ -20,6 +22,7 @@ export async function slugify(string, schema) {
     "have",
     "had",
   ];
+
   linkingVerbs.forEach((verb) => {
     const verbRegex = new RegExp(`\\b${verb}\\b`, "g"); // Using word boundaries to match whole words
     string = string.replace(verbRegex, "");
@@ -33,12 +36,19 @@ export async function slugify(string, schema) {
 
   // Check if the schema is defined.
   if (schema) {
-    console.log(schema, " this is a testes tse ");
     // Check if the slug already exists in the database.
     const existingBlog = await schema.findOne({ slug: string });
     if (existingBlog) {
       // Append a unique identifier to the slug.
-      string += "-" + Date.now();
+      // string += "-" + Date.now();
+      return sendError(
+        res,
+        `${
+          schema.schema._userProvidedOptions.name.charAt(0).toUpperCase() +
+          schema.schema._userProvidedOptions.name.slice(1)
+        } with given slug already exists.`,
+        400
+      );
     }
   }
 

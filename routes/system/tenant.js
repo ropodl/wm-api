@@ -26,7 +26,7 @@ router.post("/tenant", async (req, res) => {
 
   userSchema.pre("save", async function (next) {
     if (this.isModified("password")) {
-      this.password = bcrypt.hash(this.password, 10);
+      this.password = await bcrypt.hash(this.password, 10);
     }
     next();
   });
@@ -41,69 +41,32 @@ router.post("/tenant", async (req, res) => {
   });
 
   await user.save();
+  console.log(req);
 
+  // listen 80 default_server;
+  // listen [::]:80 default_server;
   const config = `server {
-        listen 80 default_server;
-        listen [::]:80 default_server;
 
-        root /var/www/html;
+        # root /var/www/html;
 
         # Add index.php to the list if you are using PHP
-        index index.html index.htm index.nginx-debian.html;
+        # index index.html index.htm index.nginx-debian.html;
 
-        server_name _;
+        server_name ${sub};
 
         location / {
-                # First attempt to serve request as file, then
-                # as directory, then fall back to displaying a 404.
-                try_files $uri $uri/ =404;
-                proxy_set_header x-tenant-id ${dbName}
-	        proxy_pass http://localhost:3000;
-        	# proxy_http_version 1.1;
-	        # proxy_set_header Upgrade $http_upgrade;
-        	# proxy_set_header Connection 'upgrade';
-	        # proxy_set_header Host $host;
-        	# proxy_cache_bypass $http_upgrade;
+          # First attempt to serve request as file, then
+          # as directory, then fall back to displaying a 404.
+          try_files $uri $uri/ =404;
+          proxy_set_header tenant_id ${dbName};
+	        proxy_pass http://localhost:3000/;
+        	proxy_http_version 1.1;
+	        proxy_set_header Upgrade $http_upgrade;
+        	proxy_set_header Connection 'upgrade';
+	        proxy_set_header Host $host;
+        	proxy_cache_bypass $http_upgrade;
         }
-
-        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
-        #
-        #location ~ \.php$ {
-        #       include snippets/fastcgi-php.conf;
-        #
-        #       # With php7.0-cgi alone:
-        #       fastcgi_pass 127.0.0.1:9000;
-        #       # With php7.0-fpm:
-        #       fastcgi_pass unix:/run/php/php7.0-fpm.sock;
-        #}
-
-        # deny access to .htaccess files, if Apache's document root
-        # concurs with nginx's one
-        #
-        #location ~ /\.ht {
-        #       deny all;
-        #}
-}
-
-
-# Virtual Host configuration for example.com
-#
-# You can move that to a different file under sites-available/ and symlink that
-# to sites-enabled/ to enable it.
-#
-#server {
-#       listen 80;
-#       listen [::]:80;
-#
-#       server_name example.com;
-#
-#       root /var/www/example.com;
-#       index index.html;
-#
-#       location / {
-#               try_files $uri $uri/ =404;
-#       }
-#}`;
+}`;
 
   createConfig(id, config);
 
