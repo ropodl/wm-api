@@ -10,6 +10,6 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - /home/ropodl/Documents/GitHub/wm-api/.env
+      - ${PWD}/.env:/app/.env
     depends_on:
       - mongodb
