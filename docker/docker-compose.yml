@@ -3,10 +3,14 @@ services:
   mongodb:
     image: mongo
     container_name: db
-
+    env_file:
+      - .env
   wmapi:
     image: wmapi:latest
+    container_name: wmapi
     ports:
       - 8000:8000
+    volumes:
+      - .env:/app/.env
     depends_on:
       - mongodb
