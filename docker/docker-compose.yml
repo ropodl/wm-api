@@ -1,0 +1,15 @@
+version: "v2"
+services:
+  mongodb:
+    image: mongo
+    container_name: db
+
+  wmapi:
+    image: wmapi:latest
+    container_name: wmapi
+    ports:
+      - 8000:8000
+    volumes:
+      - /home/ropodl/Documents/GitHub/wm-api/.env
+    depends_on:
+      - mongodb
