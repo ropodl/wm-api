@@ -4,12 +4,26 @@ import { getTenantDB } from "../../utils/tenant.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { createConfig } from "../../utils/config.js";
+import { sendError } from "../../utils/error.js";
 
 const router = Router();
 
 router.get("/tenant", async (req, res) => {
   const tenants = await TenantSchema.find({});
   res.json(tenants);
+});
+
+router.get("/tenant/search", async (req, res) => {
+  const { name } = req.query;
+  console.log(name);
+  
+  const tenant = await TenantSchema.findOne({ name });
+  console.log(tenant, "tenant");
+  if (!tenant)
+    return sendError(res, "Sorry, but this website does not exists", 404);
+  res.json({
+    success: true,
+  });
 });
 
 router.post("/tenant", async (req, res) => {

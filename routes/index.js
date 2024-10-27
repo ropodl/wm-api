@@ -7,7 +7,7 @@ const router = express.Router()
 router.use("/system", system);
 router.use("/", application);
 
-router.use("version-check/", (req,res)=>{
+router.use("/version-check/", (req,res)=>{
     res.json({
         version: "1.0.0"
     })
