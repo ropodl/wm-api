@@ -3,7 +3,6 @@ import TenantSchema from "../../model/system/tenant.js";
 import { getTenantDB } from "../../utils/tenant.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import { createConfig } from "../../utils/config.js";
 import { sendError } from "../../utils/error.js";
 
 const router = Router();
@@ -14,13 +13,13 @@ router.get("/tenant", async (req, res) => {
 });
 
 router.get("/tenant/search", async (req, res) => {
-  const { name } = req.query;
-  console.log(name);
+  const { sub } = req.query;
   
-  const tenant = await TenantSchema.findOne({ name });
-  console.log(tenant, "tenant");
+  const tenant = await TenantSchema.findOne({ sub });
+
   if (!tenant)
     return sendError(res, "Sorry, but this website does not exists", 404);
+
   res.json({
     success: true,
   });
@@ -28,9 +27,10 @@ router.get("/tenant/search", async (req, res) => {
 
 router.post("/tenant", async (req, res) => {
   const { name, sub, email } = req.body;
+
   const tenant = new TenantSchema({ name: `tenant_${name}`, sub });
+
   const { id, name: dbName } = await tenant.save();
-  console.log(tenant, " this is a tenant test");
 
   const userSchema = mongoose.Schema({
     name: { type: String, trim: true, required: true },
@@ -55,34 +55,6 @@ router.post("/tenant", async (req, res) => {
   });
 
   await user.save();
-  console.log(req);
-
-  // listen 80 default_server;
-  // listen [::]:80 default_server;
-  const config = `server {
-
-        # root /var/www/html;
-
-        # Add index.php to the list if you are using PHP
-        # index index.html index.htm index.nginx-debian.html;
-
-        server_name ${sub};
-
-        location / {
-          # First attempt to serve request as file, then
-          # as directory, then fall back to displaying a 404.
-          try_files $uri $uri/ =404;
-          proxy_set_header tenant_id ${dbName};
-	        proxy_pass http://localhost:3000/;
-        	proxy_http_version 1.1;
-	        proxy_set_header Upgrade $http_upgrade;
-        	proxy_set_header Connection 'upgrade';
-	        proxy_set_header Host $host;
-        	proxy_cache_bypass $http_upgrade;
-        }
-}`;
-
-  createConfig(id, config);
 
   res.json({
     name,
