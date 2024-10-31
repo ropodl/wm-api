@@ -10,9 +10,8 @@ import {
 import UserSchema from "../../model/application/user.js";
 
 export async function create(req, res) {
-  const { title, excerpt, content, status, keywords } = req.body;
+  const { title, excerpt, content, status, interests: i } = req.body;
   const { file } = req;
-
   const { tenant_id } = req.headers;
 
   const tenantdb = await getTenantDB(tenant_id);
@@ -25,6 +24,8 @@ export async function create(req, res) {
 
   const slug = await slugify(title, tenantPost, res);
 
+  const interests = i.split(",");
+  console.log(interests);
   const post = new tenantPost({
     title,
     slug,
@@ -32,13 +33,13 @@ export async function create(req, res) {
     content,
     featuredImage,
     status,
-    keywords,
+    interests
   });
   await post.save();
 
   res.status(200).json({
     success: true,
-    post: { title, slug, excerpt, content, featuredImage, status, keywords },
+    post: { title, slug, excerpt, content, featuredImage, status, interests },
   });
 }
 

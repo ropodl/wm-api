@@ -12,7 +12,7 @@ const UserSchema = mongoose.Schema(
       enum: ["admin", "editor", "user"],
       default: "user",
     },
-    interests: { type: mongoose.Schema.Types.ObjectId, ref: "interests" },
+    interests: [{ type: mongoose.Schema.Types.ObjectId, ref: "interest", required: false }],
   },
   {
     name: "user",

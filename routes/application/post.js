@@ -7,6 +7,6 @@ const router = express.Router();
 router.get("/", all);
 router.get("/r", getRecommendedPosts)
 
-router.post("/", uploadImage.single("file"), create);
+router.post("/", uploadImage.single("image"), create);
 
 export default router;

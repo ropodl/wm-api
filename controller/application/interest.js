@@ -26,7 +26,7 @@ export async function all(req, res) {
 }
 
 export async function create(req, res) {
-  const { title } = req.body;
+  const { title, description, status } = req.body;
   const { tenant_id } = req.headers;
 
   const tenantdb = await getTenantDB(tenant_id);
@@ -34,7 +34,7 @@ export async function create(req, res) {
 
   const slug = await slugify(title, tenantInterest, res);
 
-  const interest = new tenantInterest({ title, slug });
+  const interest = new tenantInterest({ title, slug, description, status });
   await interest.save();
 
   res.status(200).json({
@@ -42,6 +42,7 @@ export async function create(req, res) {
     interest: {
       title,
       slug,
+      description
     },
   });
 }
