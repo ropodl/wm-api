@@ -9,6 +9,7 @@ import "express-async-errors";
 import { errorHandler, handleNotFound } from "./middleware/errorHandler.js";
 import routes from "./routes/index.js";
 import "dotenv/config";
+// import { migrate } from "./migration/index.js";
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.get("/rrr", (req, res) => {
   res.send(largeResponse);
 });
 app.use("/api/v1", routes);
+// app.use("/migrate", migrate)
 app.get("/get-all-routes", (req, res) => {
   console.log(all_routes(app));
   res.json("Open console to see all routes");

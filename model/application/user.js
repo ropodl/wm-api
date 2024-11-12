@@ -12,7 +12,8 @@ const UserSchema = mongoose.Schema(
       enum: ["admin", "editor", "user"],
       default: "user",
     },
-    interests: [{ type: mongoose.Schema.Types.ObjectId, ref: "interest", required: false }],
+    interests: [{ type: mongoose.Schema.Types.ObjectId, ref: "interests", required: false }],
+    image: { type: Object, url: String, name: String },
   },
   {
     name: "user",

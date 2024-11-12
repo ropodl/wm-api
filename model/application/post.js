@@ -6,10 +6,10 @@ const PostSchema = mongoose.Schema(
     slug: { type: String, trim: true, required: true, unique: true },
     excerpt: { type: String, trim: true },
     content: { type: String, trim: true, required: true },
-    featuredImage: { type: Object, url: String, name: String },
+    image: { type: Object, url: String, name: String },
     status: { type: String, required: true, enum: ["Draft", "Published"] },
-    interests: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "interest", required: true },
+    tags: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "interests", required: true },
     ],
   },
   {
@@ -17,7 +17,5 @@ const PostSchema = mongoose.Schema(
     timestamps: true,
   }
 );
-
-mongoose.model("post", PostSchema);
 
 export default PostSchema;

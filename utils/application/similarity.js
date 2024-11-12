@@ -1,13 +1,19 @@
-export function calculateCosineSimilarity(vec1, vec2) {
-  const dotProduct = vec1.reduce((acc, val, i) => acc + val * vec2[i], 0);
-  const magnitude1 = Math.sqrt(vec1.reduce((acc, val) => acc + val * val, 0));
-  const magnitude2 = Math.sqrt(vec2.reduce((acc, val) => acc + val * val, 0));
+export const calculateCosineSimilarity = (vectorA, vectorB) => {
+  const dotProduct = vectorA.reduce((sum, value, idx) => sum + value * vectorB[idx], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, value) => sum + value ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, value) => sum + value ** 2, 0));
 
-  if (magnitude1 === 0 || magnitude2 === 0) return 0;
-  return dotProduct / (magnitude1 * magnitude2);
-}
+  return dotProduct / (magnitudeA * magnitudeB);
+};
 
-export function createVector(text, vocabulary) {
-  const words = text.toLowerCase().split(/\W+/).filter(Boolean);
-  return vocabulary.map((term) => words.filter((word) => word === term).length);
-}
+export const createVector = (text, vocabulary) => {
+  const vector = new Array(vocabulary.length).fill(0);
+  const words = text.split(" ");
+  words.forEach((word) => {
+    const idx = vocabulary.indexOf(word);
+    if (idx >= 0) {
+      vector[idx]++;
+    }
+  });
+  return vector;
+};

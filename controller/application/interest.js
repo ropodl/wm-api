@@ -3,6 +3,7 @@ import InterestSchema from "../../model/application/interest.js";
 import { paginate } from "../../utils/application/paginate.js";
 import { sendError } from "../../utils/error.js";
 import { slugify } from "../../utils/common/slugify.js";
+import interest from "../../migration/interest.js";
 
 export async function all(req, res) {
   const { tenant_id } = req.headers;

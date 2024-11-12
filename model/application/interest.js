@@ -6,10 +6,8 @@ const interestSchema = mongoose.Schema({
     description: { type: String, trim: true },
     status: { type: String, required: true, enum: ["Draft", "Published"] },
 },{
-    name: "interest",
+    name: "interests",
     timestamps: true
-})
-
-mongoose.model("interest", interestSchema);
+});
 
 export default interestSchema;
