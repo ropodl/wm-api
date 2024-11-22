@@ -40,7 +40,7 @@ export async function slugify(string, schema, res) {
     const existingBlog = await schema.findOne({ slug: string });
     if (existingBlog) {
       // Append a unique identifier to the slug.
-      // string += "-" + Date.now();
+      string += "-" + Date.now();
       return sendError(
         res,
         `${

@@ -3,14 +3,11 @@ import { getTenantDB } from "../../utils/tenant.js";
 import PostSchema from "../../model/application/post.js";
 import { imgUrl } from "../../utils/common/generateImgUrl.js";
 import { slugify } from "../../utils/common/slugify.js";
-import {
-  calculateCosineSimilarity,
-  createVector,
-} from "../../utils/application/similarity.js";
 import InterestSchema from "../../model/application/interest.js";
 import UserSchema from "../../model/application/user.js";
 import { sendError } from "../../utils/error.js";
-import jwt from "jsonwebtoken";
+import interestSchema from "../../model/application/interest.js";
+import { isValidObjectId } from "mongoose";
 // import { faker } from "@faker-js/faker";
 
 export const create = async (req, res) => {
@@ -28,7 +25,6 @@ export const create = async (req, res) => {
 
   const slug = await slugify(title, tenantPost, res);
 
-  
   const tags = i.split(",");
   const post = new tenantPost({
     title,
@@ -39,11 +35,11 @@ export const create = async (req, res) => {
     status,
     tags,
   });
-  await post.save();
+  const { id } = await post.save();
 
   res.status(200).json({
     success: true,
-    post: { title, slug, excerpt, content, image, status, tags },
+    id,
   });
 };
 
@@ -86,22 +82,36 @@ const cosineSimilarity = (userInterests, postTags) => {
   const allInterests = new Set([...userInterests, ...postTags]);
 
   // Convert interests and tags into binary vectors
-  const userVector = Array.from(allInterests).map(interestId => userInterests.includes(interestId) ? 1 : 0);
-  const postVector = Array.from(allInterests).map(interestId => postTags.includes(interestId) ? 1 : 0);
+  const userVector = Array.from(allInterests).map((interestId) =>
+    userInterests.includes(interestId) ? 1 : 0
+  );
+  const postVector = Array.from(allInterests).map((interestId) =>
+    postTags.includes(interestId) ? 1 : 0
+  );
 
   // Calculate dot product and magnitudes of the vectors
-  const dotProduct = userVector.reduce((sum, val, i) => sum + val * postVector[i], 0);
-  const userMagnitude = Math.sqrt(userVector.reduce((sum, val) => sum + val * val, 0));
-  const postMagnitude = Math.sqrt(postVector.reduce((sum, val) => sum + val * val, 0));
+  const dotProduct = userVector.reduce(
+    (sum, val, i) => sum + val * postVector[i],
+    0
+  );
+  const userMagnitude = Math.sqrt(
+    userVector.reduce((sum, val) => sum + val * val, 0)
+  );
+  const postMagnitude = Math.sqrt(
+    postVector.reduce((sum, val) => sum + val * val, 0)
+  );
 
   // Calculate cosine similarity
-  return userMagnitude && postMagnitude ? dotProduct / (userMagnitude * postMagnitude) : 0;
+  return userMagnitude && postMagnitude
+    ? dotProduct / (userMagnitude * postMagnitude)
+    : 0;
 };
 
 export const recommended = async (req, res) => {
   const { tenant_id } = req.headers;
   const { id } = req.params;
-  const { page = 1, itemsPerPage = 10 } = req.query; // Get page and itemsPerPage from query params
+  // Get page and itemsPerPage from query params
+  const { page = 1, itemsPerPage = 10 } = req.query;
 
   const tenantdb = await getTenantDB(tenant_id);
   const User = tenantdb.model("user", UserSchema);
@@ -156,14 +166,57 @@ export const recommended = async (req, res) => {
 };
 
 export const postId = async (req, res) => {
+  const { tenant_id } = req.headers;
+  const { id } = req.params;
+  const { populate } = req.query
+
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantPost = tenantdb.model("post", PostSchema);
+  tenantdb.model("interests", interestSchema);
+
+  let post;
+  if(!populate) 
+    post = await tenantPost.findById(id);
+  else post = post = await tenantPost.findById(id).populate("tags");
+  if (!post) return sendError(res, "Invalid request, Post not found", 404);
+
+  res.json(post);
+};
+
+export const update = async (req, res) => {
+  const { title, excerpt, content, status, tags: i } = req.body;
+  const { file } = req;
   const { id } = req.params;
   const { tenant_id } = req.headers;
+  console.log(i.toString(),"first");
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantPost = tenantdb.model("post", PostSchema);
 
-  const post = await tenantPost.findById(id);
-  if (!post) return sendError(res, "Invalid request, Post not found", 404);
+  if (!isValidObjectId(id)) return sendError(res, "Post ID not valid", 404);
 
-  res.json(post);
+  const post = await tenantPost.findById(id);
+  if (!post) return sendError(res, "Post not found", 404);
+  console.log(title);
+
+  if (title !== post.title) post.slug = await slugify(title, tenantPost, res);
+
+  post.title = title;
+  post.content = content;
+  post.excerpt = excerpt;
+  post.status = status;
+  post.tags = i.split(",");
+
+  if (file)
+    post.image = {
+      url: imgUrl(req, res, file),
+      name: file.filename,
+    };
+
+  await post.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Post updated successfully",
+  });
 };

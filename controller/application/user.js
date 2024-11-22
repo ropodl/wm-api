@@ -4,7 +4,7 @@ import { sendError } from "../../utils/error.js";
 import { getTenantDB } from "../../utils/tenant.js";
 
 export async function create(req, res) {
-  const { name, email, password, role, interests } = req.body;
+  const { name, email, password, role, interests, phone_number, user_name } = req.body;
   const { tenant_id } = req.headers;
 
   const tenantdb = await getTenantDB(tenant_id);
@@ -16,7 +16,7 @@ export async function create(req, res) {
     }
     next();
   });
-  
+
   UserSchema.methods.comparePassword = async function (password) {
     const result = await bcrypt.compare(password, this.password);
     return result;
@@ -26,7 +26,15 @@ export async function create(req, res) {
   if (oldUser)
     return sendError(res, "User with given email already exists.", 400);
 
-  const user = new tenantUser({ name, email, password, role, interests });
+  const user = new tenantUser({
+    name,
+    email,
+    password,
+    role,
+    interests,
+    user_name,
+    phone_number,
+  });
   await user.save();
 
   res.status(200).json({
@@ -57,3 +65,23 @@ export async function all(req, res) {
 
   res.json({ users, pagination: paginatedUsers.pagination });
 }
+
+export const userById = async (req, res) => {
+  const { tenant_id } = req.headers;
+  const { id } = req.params;
+
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantUser = tenantdb.model("user", UserSchema);
+
+  const { name, email, interests, image, user_name, phone_number } =
+    await tenantUser.findById(id);
+
+  res.json({
+    name,
+    email,
+    interests,
+    image,
+    user_name,
+    phone_number,
+  });
+};
