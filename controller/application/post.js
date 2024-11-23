@@ -59,7 +59,7 @@ export const all = async (req, res) => {
 
   const posts = await Promise.all(
     paginatedPosts.documents.map(async (post) => {
-      const { id, title, excerpt, content, image, slug } = post;
+      const { id, title, excerpt, content, image, slug } = await post;
       return {
         id,
         title,
@@ -168,15 +168,14 @@ export const recommended = async (req, res) => {
 export const postId = async (req, res) => {
   const { tenant_id } = req.headers;
   const { id } = req.params;
-  const { populate } = req.query
+  const { populate } = req.query;
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantPost = tenantdb.model("post", PostSchema);
   tenantdb.model("interests", interestSchema);
 
   let post;
-  if(!populate) 
-    post = await tenantPost.findById(id);
+  if (!populate) post = await tenantPost.findById(id);
   else post = post = await tenantPost.findById(id).populate("tags");
   if (!post) return sendError(res, "Invalid request, Post not found", 404);
 
@@ -188,7 +187,7 @@ export const update = async (req, res) => {
   const { file } = req;
   const { id } = req.params;
   const { tenant_id } = req.headers;
-  console.log(i.toString(),"first");
+  console.log(i.toString(), "first");
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantPost = tenantdb.model("post", PostSchema);

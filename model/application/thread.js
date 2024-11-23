@@ -2,14 +2,18 @@ import mongoose from "mongoose";
 
 const threadSchema = mongoose.Schema(
   {
-    forumId: {
+    forum: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "forum",
+      ref: "forums",
       required: true,
     },
     title: { type: String, required: true },
     content: { type: String, required: true },
-    author: { type: String, required: true },
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
+    },
   },
   {
     timestamps: true,

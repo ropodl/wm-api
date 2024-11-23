@@ -7,7 +7,7 @@ export const create = async (req, res) => {
   const { tenant_id } = req.headers;
 
   const tenantdb = await getTenantDB(tenant_id);
-  const tenantForum = tenantdb.model("forum", forumSchema);
+  const tenantForum = tenantdb.model("forums", forumSchema);
 
   const forum = new tenantForum({
     name,
@@ -26,7 +26,7 @@ export const all = async (req, res) => {
   const { tenant_id } = req.headers;
 
   const tenantdb = await getTenantDB(tenant_id);
-  const tenantForum = tenantdb.model("forum", forumSchema);
+  const tenantForum = tenantdb.model("forums", forumSchema);
 
   const paginatedForums = await paginate(
     tenantForum,
@@ -38,7 +38,7 @@ export const all = async (req, res) => {
 
   const forums = await Promise.all(
     paginatedForums.documents.map(async (forum) => {
-      const { id, name, desciption } = forums;
+      const { id, name, desciption } = forum;
       return {
         id,
         name,
