@@ -33,6 +33,7 @@ export const getThread = async (req, res) => {
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantThread = tenantdb.model("threads", threadSchema);
+  tenantdb.model("users", UserSchema);
 
   const paginatedThreads = await paginate(
     tenantThread,
@@ -44,12 +45,17 @@ export const getThread = async (req, res) => {
 
   const threads = await Promise.all(
     paginatedThreads.documents.map(async (thread) => {
-      const { id, title, content, author } = thread;
+      console.log(thread);
+      const populatedThread = await tenantThread
+        .findById(thread._id)
+        .populate("author", "name email image");
+      const { id, title, content, author, createdAt } = populatedThread;
       return {
         id,
         title,
         content,
         author,
+        createdAt,
       };
     })
   );

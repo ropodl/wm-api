@@ -187,7 +187,6 @@ export const update = async (req, res) => {
   const { file } = req;
   const { id } = req.params;
   const { tenant_id } = req.headers;
-  console.log(i.toString(), "first");
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantPost = tenantdb.model("post", PostSchema);
