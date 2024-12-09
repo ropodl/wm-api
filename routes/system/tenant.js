@@ -7,14 +7,14 @@ import { sendError } from "../../utils/error.js";
 
 const router = Router();
 
-router.get("/tenant", async (req, res) => {
+router.get("/", async (req, res) => {
   const tenants = await TenantSchema.find({});
   res.json(tenants);
 });
 
-router.get("/tenant/search", async (req, res) => {
+router.get("/search", async (req, res) => {
   const { sub } = req.query;
-  
+
   const tenant = await TenantSchema.findOne({ sub });
 
   if (!tenant)
@@ -25,7 +25,7 @@ router.get("/tenant/search", async (req, res) => {
   });
 });
 
-router.post("/tenant", async (req, res) => {
+router.post("/", async (req, res) => {
   const { name, sub, email } = req.body;
 
   const tenant = new TenantSchema({ name: `tenant_${name}`, sub });

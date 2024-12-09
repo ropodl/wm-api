@@ -38,11 +38,12 @@ export const all = async (req, res) => {
 
   const forums = await Promise.all(
     paginatedForums.documents.map(async (forum) => {
-      const { id, name, desciption } = forum;
+      const { id, name, desciption, image } = forum;
       return {
         id,
         name,
         desciption,
+        image,
       };
     })
   );
