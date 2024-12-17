@@ -217,3 +217,34 @@ export const update = async (req, res) => {
     message: "Post updated successfully",
   });
 };
+
+export const remove = async (req, res) => {
+  const { tenant_id } = req.headers;
+  const { id } = req.params;
+
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantPost = tenantdb.model("post", PostSchema);
+
+  // Check if the post ID is valid
+  if (!isValidObjectId(id)) return sendError(res, "Invalid Post ID", 400);
+
+  try {
+    // Find and remove the post by ID
+    const post = await tenantPost.findByIdAndDelete(id);
+
+    // If no post is found
+    if (!post) return sendError(res, "Post not found", 404);
+
+    // Return success response
+    res.status(200).json({
+      success: true,
+      message: "Post deleted successfully",
+      postId: id, // Optionally return the deleted post's ID
+    });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ error: "Error deleting the post", message: error.message });
+  }
+};
