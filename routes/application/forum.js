@@ -6,10 +6,11 @@ import {
   getThreadById,
   getThreadComment,
 } from "../../controller/application/thread.js";
+import { uploadImage } from "../../middleware/application/multer.js";
 
 const router = express.Router();
 // forums
-router.post("/create", create);
+router.post("/create", uploadImage.single("image"), create);
 // threads
 router.post("/:id/threads", createThread);
 

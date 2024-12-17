@@ -1,17 +1,27 @@
 import forumSchema from "../../model/application/forum.js";
 import { paginate } from "../../utils/application/paginate.js";
+import { imgUrl } from "../../utils/common/generateImgUrl.js";
 import { getTenantDB } from "../../utils/tenant.js";
 
 export const create = async (req, res) => {
-  const { name, desciption } = req.body;
+  const { name, description } = req.body;
+  const { file } = req;
   const { tenant_id } = req.headers;
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantForum = tenantdb.model("forums", forumSchema);
 
+  // console.log(req.file, "this is a test");
+
+  const image = {
+    url: imgUrl(req, res, file),
+    name: file.filename,
+  };
+
   const forum = new tenantForum({
     name,
-    desciption,
+    description,
+    image,
   });
 
   const { id } = await forum.save();

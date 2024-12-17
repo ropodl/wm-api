@@ -8,7 +8,6 @@ import UserSchema from "../../model/application/user.js";
 import { sendError } from "../../utils/error.js";
 import interestSchema from "../../model/application/interest.js";
 import { isValidObjectId } from "mongoose";
-// import { faker } from "@faker-js/faker";
 
 export const create = async (req, res) => {
   const { title, excerpt, content, status, tags: i } = req.body;
