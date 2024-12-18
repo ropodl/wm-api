@@ -4,7 +4,7 @@ const threadSchema = mongoose.Schema(
   {
     forum: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "forums",
+      ref: "forum",
       required: true,
     },
     title: { type: String, required: true },
@@ -16,6 +16,7 @@ const threadSchema = mongoose.Schema(
     },
   },
   {
+    name: "thread",
     timestamps: true,
   }
 );

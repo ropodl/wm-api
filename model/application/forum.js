@@ -8,6 +8,7 @@ const forumSchema = mongoose.Schema(
     status: { type: String, required: true, enum: ["Draft", "Published"] },
   },
   {
+    name: "forum",
     timestamps: true,
   }
 );
