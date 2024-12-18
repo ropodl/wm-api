@@ -4,6 +4,7 @@ import post from "./post.js";
 import interest from "./interest.js";
 import auth from "./auth.js";
 import forum from "./forum.js";
+import feedback from "./feedback.js";
 
 const router = express.Router();
 
@@ -16,5 +17,7 @@ router.use("/post", post);
 router.use("/interest", interest);
 
 router.use("/forums", forum);
+
+router.use("/feedback", feedback);
 
 export default router;

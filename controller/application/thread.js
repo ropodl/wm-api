@@ -84,7 +84,7 @@ export const getThreadComment = async (req, res) => {
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantComment = tenantdb.model("comments", commentSchema);
-  tenantdb.model("users", UserSchema);
+  tenantdb.model("user", UserSchema);
 
   const paginatedComments = await paginate(
     tenantComment,

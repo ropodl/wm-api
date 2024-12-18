@@ -1,10 +1,8 @@
 import { getTenantDB } from "../../utils/tenant.js";
 import InterestSchema from "../../model/application/interest.js";
 import { paginate } from "../../utils/application/paginate.js";
-import { sendError } from "../../utils/error.js";
 import { slugify } from "../../utils/common/slugify.js";
 import UserSchema from "../../model/application/user.js";
-import { isValidObjectId } from "mongoose";
 
 export async function all(req, res) {
   const { tenant_id } = req.headers;

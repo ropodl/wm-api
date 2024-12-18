@@ -8,7 +8,10 @@ const commentSchema = mongoose.Schema(
       required: true,
     },
     content: { type: String, required: true },
+    upvote: { type: Number, default: 0 },
+    downvote: { type: Number, default: 0 },
     author: { type: String, required: true },
+    isSpam: { type: Boolean, default: false },
   },
   {
     timestamps: true,
