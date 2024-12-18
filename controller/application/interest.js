@@ -57,10 +57,7 @@ export const addUserInterest = async (req, res) => {
   const tenantdb = await getTenantDB(tenant_id);
   const tenantUser = tenantdb.model("user", UserSchema);
 
-  // const tenantInterest = tenantdb.model("interest", InterestSchema);
-
   const user = await tenantUser.findOne({ _id: user_id });
-  // const interest = await tenantInterest.findOne({ _id: interest_id });
 
   user.interests.push(interest_id);
 
