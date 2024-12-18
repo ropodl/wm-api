@@ -3,7 +3,8 @@ import InterestSchema from "../../model/application/interest.js";
 import { paginate } from "../../utils/application/paginate.js";
 import { sendError } from "../../utils/error.js";
 import { slugify } from "../../utils/common/slugify.js";
-import interest from "../../migration/interest.js";
+import UserSchema from "../../model/application/user.js";
+import { isValidObjectId } from "mongoose";
 
 export async function all(req, res) {
   const { tenant_id } = req.headers;
@@ -26,7 +27,7 @@ export async function all(req, res) {
   });
 }
 
-export async function create(req, res) {
+export const create = async (req, res) => {
   const { title, description, status } = req.body;
   const { tenant_id } = req.headers;
 
@@ -43,7 +44,27 @@ export async function create(req, res) {
     interest: {
       title,
       slug,
-      description
+      description,
     },
   });
-}
+};
+
+export const addUserInterest = async (req, res) => {
+  const { user_id, interest_id } = req.query;
+  const { tenant_id } = req.headers;
+  console.log(user_id, interest_id, "test");
+
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantUser = tenantdb.model("user", UserSchema);
+
+  // const tenantInterest = tenantdb.model("interest", InterestSchema);
+
+  const user = await tenantUser.findOne({ _id: user_id });
+  // const interest = await tenantInterest.findOne({ _id: interest_id });
+
+  user.interests.push(interest_id);
+
+  await user.save();
+
+  res.json({ message: "Interest added successfully" });
+};

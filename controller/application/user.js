@@ -3,8 +3,9 @@ import { paginate } from "../../utils/application/paginate.js";
 import { sendError } from "../../utils/error.js";
 import { getTenantDB } from "../../utils/tenant.js";
 
-export async function create(req, res) {
-  const { name, email, password, role, interests, phone_number, user_name } = req.body;
+export const create = async (req, res) => {
+  const { name, email, password, role, interests, phone_number, user_name } =
+    req.body;
   const { tenant_id } = req.headers;
 
   const tenantdb = await getTenantDB(tenant_id);
@@ -41,7 +42,7 @@ export async function create(req, res) {
     success: true,
     user,
   });
-}
+};
 
 export async function all(req, res) {
   const { tenant_id } = req.headers;

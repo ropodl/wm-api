@@ -4,6 +4,7 @@ import {
   all,
   getForumById,
   update,
+  remove,
 } from "../../controller/application/forum.js";
 import {
   createThread,
@@ -17,6 +18,7 @@ const router = express.Router();
 // forums
 router.post("/create", uploadImage.single("image"), create);
 router.patch("/:id", uploadImage.single("image"), update);
+router.delete("/:id", remove);
 // threads
 router.post("/:id/threads", createThread);
 
