@@ -11,6 +11,7 @@ import {
   getThread,
   getThreadById,
   getThreadComment,
+  createThreadComment,
 } from "../../controller/application/thread.js";
 import { uploadImage } from "../../middleware/application/multer.js";
 
@@ -21,6 +22,8 @@ router.patch("/:id", uploadImage.single("image"), update);
 router.delete("/:id", remove);
 // threads
 router.post("/:id/threads", createThread);
+// comments
+router.post("/threads/:tid/comments", createThreadComment);
 
 router.get("/", all);
 router.get("/:id", getForumById);

@@ -9,7 +9,8 @@ import forumSchema from "../../model/application/forum.js";
 export const createThread = async (req, res) => {
   const { tenant_id } = req.headers;
   const { id } = req.params;
-  const { title, content, author } = req.body;
+  const { title, content } = req.body;
+  const { user_id } = req.query;
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantThread = tenantdb.model("threads", threadSchema);
@@ -18,7 +19,7 @@ export const createThread = async (req, res) => {
     forum: id,
     title,
     content,
-    author,
+    author: user_id,
   });
 
   const { id: tid } = await thread.save();
@@ -307,5 +308,29 @@ export const getThreadComment = async (req, res) => {
   res.json({
     comments,
     pagination: paginatedComments.pagination,
+  });
+};
+
+export const createThreadComment = async (req, res) => {
+  const { tenant_id } = req.headers;
+  const { content } = req.body;
+  const { tid } = req.params;
+  const { author_id } = req.query;
+
+  console.log(tid, "test");
+
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantComment = tenantdb.model("comments", commentSchema);
+
+  const comment = new tenantComment({
+    thread: tid,
+    content,
+    author: author_id,
+  });
+
+  await comment.save();
+
+  res.json({
+    a: "test",
   });
 };
