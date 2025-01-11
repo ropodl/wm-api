@@ -63,3 +63,16 @@ export const addUserInterest = async (req, res) => {
 
   res.json({ message: "Interest added successfully" });
 };
+
+export const getUserInterest = async () => {
+  const { user_id } = req.query;
+  const { tenant_id } = req.headers;
+
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantUser = tenantdb.model("user", UserSchema);
+
+  const user = await tenantUser.findOne({ _id: user_id });
+
+  console.log(user);
+  res.json({ user });
+};

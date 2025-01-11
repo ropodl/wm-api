@@ -82,42 +82,6 @@ export const getThreadById = async (req, res) => {
   res.json(thread);
 };
 
-// export const getThreadComment = async (req, res) => {
-//   const { tenant_id } = req.headers;
-
-//   const tenantdb = await getTenantDB(tenant_id);
-//   const tenantComment = tenantdb.model("comments", commentSchema);
-//   tenantdb.model("user", UserSchema);
-
-//   const paginatedComments = await paginate(
-//     tenantComment,
-//     1,
-//     10,
-//     {},
-//     { createdAt: "-1" }
-//   );
-
-//   const comments = await Promise.all(
-//     paginatedComments.documents.map(async (comment) => {
-//       console.log(comment);
-//       const populatedComment = await tenantComment
-//         .findById(comment._id)
-//         .populate("author", "name email image");
-//       const { id, content, author, thread } = populatedComment;
-//       return {
-//         id,
-//         content,
-//         author,
-//         thread,
-//       };
-//     })
-//   );
-
-//   res.json({
-//     comments,
-//     pagination: paginatedComments.pagination,
-//   });
-// };
 export const getThreadComment = async (req, res) => {
   const { tenant_id } = req.headers;
 

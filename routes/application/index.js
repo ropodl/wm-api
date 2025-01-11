@@ -5,8 +5,11 @@ import interest from "./interest.js";
 import auth from "./auth.js";
 import forum from "./forum.js";
 import feedback from "./feedback.js";
+import admin from "./admin/index.js";
 
 const router = express.Router();
+
+router.use("/admin", admin);
 
 router.use("/user", user);
 

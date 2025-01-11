@@ -44,21 +44,22 @@ export const create = async (req, res) => {
 
 export const all = async (req, res) => {
   const { tenant_id } = req.headers;
+  const { page, itemsPerPage, sortBy } = req.query;
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantPost = tenantdb.model("post", PostSchema);
 
   const paginatedPosts = await paginate(
     tenantPost,
-    1,
-    10,
+    page,
+    itemsPerPage,
     {},
-    { createdAt: "-1" }
+    sortBy
   );
 
   const posts = await Promise.all(
     paginatedPosts.documents.map(async (post) => {
-      const { id, title, excerpt, content, image, slug } = await post;
+      const { id, title, excerpt, content, image, slug, status } = await post;
       return {
         id,
         title,
@@ -66,9 +67,11 @@ export const all = async (req, res) => {
         content,
         image,
         slug,
+        status,
       };
     })
   );
+  console.log(posts);
 
   res.json({
     posts,

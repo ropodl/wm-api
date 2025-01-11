@@ -1,0 +1,8 @@
+import express from "express";
+import { all } from "../../../controller/application/admin/dashboard.js";
+
+const router = express.Router();
+
+router.get("/", all);
+
+export default router;
