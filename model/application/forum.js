@@ -6,6 +6,10 @@ const forumSchema = mongoose.Schema(
     description: { type: String, required: true },
     image: { type: Object, url: String, name: String },
     status: { type: String, required: true, enum: ["Draft", "Published"] },
+    threads: {
+      type: Array,
+      required: false,
+    },
   },
   {
     name: "forum",

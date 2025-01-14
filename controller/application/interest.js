@@ -3,14 +3,22 @@ import InterestSchema from "../../model/application/interest.js";
 import { paginate } from "../../utils/application/paginate.js";
 import { slugify } from "../../utils/common/slugify.js";
 import UserSchema from "../../model/application/user.js";
+import { sendError } from "../../utils/error.js";
 
 export async function all(req, res) {
   const { tenant_id } = req.headers;
+  const { page, itemsPerPage, sortBy } = req.query;
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantInterest = tenantdb.model("interest", InterestSchema);
 
-  const paginatedInterests = await paginate(tenantInterest, 1, 10, {}, {});
+  const paginatedInterests = await paginate(
+    tenantInterest,
+    page,
+    itemsPerPage,
+    {},
+    sortBy
+  );
 
   const interests = await Promise.all(
     paginatedInterests.documents.map(async (interest) => {
@@ -50,18 +58,23 @@ export const create = async (req, res) => {
 export const addUserInterest = async (req, res) => {
   const { user_id, interest_id } = req.query;
   const { tenant_id } = req.headers;
-  console.log(user_id, interest_id, "test");
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantUser = tenantdb.model("user", UserSchema);
 
   const user = await tenantUser.findOne({ _id: user_id });
+  // const interests = user.interests;
+  console.log(user);
+  // if (interests.includes(interest_id))
+  //   return sendError(res, "Interests already existes", 400);
 
   user.interests.push(interest_id);
-
   await user.save();
 
-  res.json({ message: "Interest added successfully" });
+  res.json({
+    message: "Interest added successfully",
+    interests: user.interests,
+  });
 };
 
 export const getUserInterest = async () => {
@@ -72,7 +85,6 @@ export const getUserInterest = async () => {
   const tenantUser = tenantdb.model("user", UserSchema);
 
   const user = await tenantUser.findOne({ _id: user_id });
-
-  console.log(user);
-  res.json({ user });
+  const interests = user.interests;
+  res.json({ interests });
 };

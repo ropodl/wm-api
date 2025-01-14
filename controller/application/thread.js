@@ -30,6 +30,8 @@ export const createThread = async (req, res) => {
 };
 
 export const getThread = async (req, res) => {
+  console.log("this is a test");
+
   const { tenant_id } = req.headers;
   const { id } = req.params;
 
@@ -42,17 +44,19 @@ export const getThread = async (req, res) => {
     tenantThread,
     1,
     10,
-    {},
+    { forum: id },
     { createAt: "-1" }
   );
 
   const threads = await Promise.all(
     paginatedThreads.documents.map(async (thread) => {
+      console.log(thread);
+      // @TODO - check if _id is necessary
       const populatedThread = await tenantThread
         .findById(thread._id)
         .populate("author", "name email image")
         .populate("forum");
-      console.log(populatedThread);
+      // console.log(populatedThread);
       const { id, title, content, author, createdAt } = populatedThread;
       return {
         id,
@@ -71,6 +75,7 @@ export const getThread = async (req, res) => {
 };
 
 export const getThreadById = async (req, res) => {
+  console.log("why");
   const { tenant_id } = req.headers;
   const { id, tid } = req.params;
 

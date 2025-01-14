@@ -1,3 +1,4 @@
+import { isValidObjectId } from "mongoose";
 import UserSchema from "../../model/application/user.js";
 import { paginate } from "../../utils/application/paginate.js";
 import { sendError } from "../../utils/error.js";
@@ -84,5 +85,33 @@ export const userById = async (req, res) => {
     image,
     user_name,
     phone_number,
+  });
+};
+
+export const update = async (req, res) => {
+  const { name, email, phone_number, user_name } = req.body;
+  const { tenant_id } = req.headers;
+  const { id } = req.params;
+
+  console.log(id);
+
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantUser = tenantdb.model("user", UserSchema);
+
+  if (!isValidObjectId(id)) return sendError(res, "User ID not valid", 404);
+
+  const user = await tenantUser.findById(id);
+  if (!user) return sendError(res, "User not found", 404);
+
+  user.name = name;
+  user.email = email;
+  user.phone_number = phone_number;
+  user.user_name = user_name;
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    message: "User profile updated successfully",
   });
 };

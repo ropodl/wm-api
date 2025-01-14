@@ -97,16 +97,17 @@ export const remove = async (req, res) => {
 
 export const all = async (req, res) => {
   const { tenant_id } = req.headers;
+  const { page, itemsPerPage, sortBy } = req.query;
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantForum = tenantdb.model("forums", forumSchema);
 
   const paginatedForums = await paginate(
     tenantForum,
-    1,
-    10,
+    page,
+    itemsPerPage,
     {},
-    { createdAt: "-1" }
+    sortBy
   );
 
   const forums = await Promise.all(
