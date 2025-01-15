@@ -1,5 +1,6 @@
 import { getTenantDB } from "../../utils/tenant.js";
 import feedbackSchema from "../../model/application/feedback.js";
+import { paginate } from "../../utils/application/paginate.js";
 
 export const create = async (req, res) => {
   const { title, suggestions, ratings } = req.body;
@@ -18,5 +19,39 @@ export const create = async (req, res) => {
 
   res.status(200).json({
     message: "Feedback submitted",
+  });
+};
+
+export const all = async (req, res) => {
+  const { tenant_id } = req.headers;
+  const { page, itemsPerPage, sortBy } = req.query;
+
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantFeedback = tenantdb.model("feedback", feedbackSchema);
+
+  const paginatedFeedback = await paginate(
+    tenantFeedback,
+    page,
+    itemsPerPage,
+    {},
+    sortBy
+  );
+
+  const feedbacks = await Promise.all(
+    paginatedFeedback.documents.map(async (feedback) => {
+      const { id, title, suggestions, ratings } = await feedback;
+      return {
+        id,
+        title,
+        suggestions,
+        ratings,
+      };
+    })
+  );
+  console.log(feedbacks);
+
+  res.json({
+    feedbacks,
+    pagination: paginatedFeedback.pagination,
   });
 };

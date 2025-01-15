@@ -50,13 +50,10 @@ export const getThread = async (req, res) => {
 
   const threads = await Promise.all(
     paginatedThreads.documents.map(async (thread) => {
-      console.log(thread);
-      // @TODO - check if _id is necessary
       const populatedThread = await tenantThread
         .findById(thread._id)
         .populate("author", "name email image")
         .populate("forum");
-      // console.log(populatedThread);
       const { id, title, content, author, createdAt } = populatedThread;
       return {
         id,
