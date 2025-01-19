@@ -3,14 +3,26 @@ import feedbackSchema from "../../model/application/feedback.js";
 import { paginate } from "../../utils/application/paginate.js";
 
 export const create = async (req, res) => {
-  const { title, suggestions, ratings } = req.body;
+  const { suggestions, ratings } = req.body;
   const { tenant_id } = req.headers;
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantFeedback = tenantdb.model("feedback", feedbackSchema);
+  const Counter = tenantdb.model("counter", {
+    name: String,
+    value: Number,
+  });
+
+  let feedbackCounter = await Counter.findOne({ name: "feedbackTitle" });
+  if (!feedbackCounter)
+    feedbackCounter = new Counter({ name: "feedbackTitle", value: 0 });
+
+  feedbackCounter.value += 1;
+
+  await feedbackCounter.save();
 
   const feedback = new tenantFeedback({
-    title,
+    title: `Feedback #${feedbackCounter.value}`,
     suggestions,
     ratings,
   });
@@ -48,7 +60,6 @@ export const all = async (req, res) => {
       };
     })
   );
-  console.log(feedbacks);
 
   res.json({
     feedbacks,

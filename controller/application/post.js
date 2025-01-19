@@ -178,7 +178,7 @@ export const postId = async (req, res) => {
 
   let post;
   if (!populate) post = await tenantPost.findById(id);
-  else post = post = await tenantPost.findById(id).populate("tags");
+  else post = await tenantPost.findById(id).populate("tags");
   if (!post) return sendError(res, "Invalid request, Post not found", 404);
 
   res.json(post);
