@@ -37,7 +37,6 @@ export const create = async (req, res) => {
   const { id } = await post.save();
 
   res.status(200).json({
-    success: true,
     id,
   });
 };
@@ -71,7 +70,6 @@ export const all = async (req, res) => {
       };
     })
   );
-  console.log(posts);
 
   res.json({
     posts,
@@ -162,7 +160,6 @@ export const recommended = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ error: "Server error" });
   }
 };
@@ -216,7 +213,6 @@ export const update = async (req, res) => {
   await post.save();
 
   res.status(200).json({
-    success: true,
     message: "Post updated successfully",
   });
 };

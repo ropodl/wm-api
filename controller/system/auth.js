@@ -14,7 +14,6 @@ export const create = async (req, res) => {
   const { id } = await user.save();
 
   res.status(200).json({
-    success: true,
     user: {
       id,
       name,

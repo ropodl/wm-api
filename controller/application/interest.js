@@ -63,7 +63,6 @@ export const create = async (req, res) => {
   const { id } = await interest.save();
 
   res.status(200).json({
-    success: true,
     id,
   });
 };

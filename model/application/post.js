@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const PostSchema = mongoose.Schema(
+const postSchema = mongoose.Schema(
   {
     title: { type: String, trim: true, required: true },
     slug: { type: String, trim: true, required: true, unique: true },
@@ -9,7 +9,11 @@ const PostSchema = mongoose.Schema(
     image: { type: Object, url: String, name: String },
     status: { type: String, required: true, enum: ["Draft", "Published"] },
     tags: [
-      { type: mongoose.Schema.Types.ObjectId, ref: "interests", required: true },
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "interests",
+        required: true,
+      },
     ],
   },
   {
@@ -18,4 +22,4 @@ const PostSchema = mongoose.Schema(
   }
 );
 
-export default PostSchema;
+export default postSchema;

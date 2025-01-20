@@ -40,7 +40,6 @@ export const create = async (req, res) => {
   await user.save();
 
   res.status(200).json({
-    success: true,
     user,
   });
 };
@@ -111,7 +110,6 @@ export const update = async (req, res) => {
   await user.save();
 
   res.status(200).json({
-    success: true,
     message: "User profile updated successfully",
   });
 };

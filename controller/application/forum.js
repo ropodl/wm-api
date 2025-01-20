@@ -28,7 +28,6 @@ export const create = async (req, res) => {
   const { id } = await forum.save();
 
   res.status(200).json({
-    success: true,
     id,
   });
 };
@@ -73,7 +72,6 @@ export const update = async (req, res) => {
   await forum.save();
 
   res.status(200).json({
-    success: true,
     message: "Forum updated successfully",
   });
 };
