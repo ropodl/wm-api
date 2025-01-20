@@ -6,6 +6,7 @@ import UserSchema from "../../model/application/user.js";
 import { sendError } from "../../utils/error.js";
 import interestSchema from "../../model/application/interest.js";
 import { isValidObjectId } from "mongoose";
+import postSchema from "../../model/application/post.js";
 
 export const all = async (req, res) => {
   const { tenant_id } = req.headers;
@@ -59,15 +60,11 @@ export const create = async (req, res) => {
   const slug = await slugify(title, tenantInterest, res);
 
   const interest = new tenantInterest({ title, slug, description, status });
-  await interest.save();
+  const { id } = await interest.save();
 
   res.status(200).json({
     success: true,
-    interest: {
-      title,
-      slug,
-      description,
-    },
+    id,
   });
 };
 
@@ -129,4 +126,32 @@ export const getUserInterest = async () => {
   const user = await tenantUser.findOne({ _id: user_id });
   const interests = user.interests;
   res.json({ interests });
+};
+
+export const remove = async (req, res) => {
+  const { id } = req.params;
+  const { tenant_id } = req.headers;
+
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantInterest = tenantdb.model("interest", interestSchema);
+  const tenantPost = tenantdb.model("post", postSchema);
+
+  if (!isValidObjectId(id)) return sendError(res, "Interest ID not valid", 404);
+
+  const interest = await tenantInterest.findById(id);
+  if (!interest) return sendError(res, "Interest not found", 404);
+
+  const relatedPosts = await tenantPost.find({ tags: id });
+  if (relatedPosts.length > 0)
+    return sendError(
+      res,
+      "Interest is currently used in one or more posts",
+      400
+    );
+
+  await tenantInterest.findByIdAndDelete(id);
+
+  res.status(200).json({
+    message: "Interest removed successfully",
+  });
 };

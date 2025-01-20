@@ -92,7 +92,7 @@ export const remove = async (req, res) => {
 
   await tenantForum.findByIdAndDelete(id);
 
-  res.json({ message: "Forum removed successfully" });
+  res.status(200).json({ message: "Forum removed successfully" });
 };
 
 export const all = async (req, res) => {

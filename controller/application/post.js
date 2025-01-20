@@ -1,6 +1,6 @@
 import { paginate } from "../../utils/application/paginate.js";
 import { getTenantDB } from "../../utils/tenant.js";
-import PostSchema from "../../model/application/post.js";
+import postSchema from "../../model/application/post.js";
 import { imgUrl } from "../../utils/common/generateImgUrl.js";
 import { slugify } from "../../utils/common/slugify.js";
 import InterestSchema from "../../model/application/interest.js";
@@ -15,7 +15,7 @@ export const create = async (req, res) => {
   const { tenant_id } = req.headers;
 
   const tenantdb = await getTenantDB(tenant_id);
-  const tenantPost = tenantdb.model("post", PostSchema);
+  const tenantPost = tenantdb.model("post", postSchema);
 
   const image = {
     url: imgUrl(req, res, file),
@@ -44,10 +44,10 @@ export const create = async (req, res) => {
 
 export const all = async (req, res) => {
   const { tenant_id } = req.headers;
-  const { page, itemsPerPage, sortBy } = req.query;
+  const { page, itemsPerPage, sortBy, search } = req.query;
 
   const tenantdb = await getTenantDB(tenant_id);
-  const tenantPost = tenantdb.model("post", PostSchema);
+  const tenantPost = tenantdb.model("post", postSchema);
 
   const paginatedPosts = await paginate(
     tenantPost,
@@ -117,7 +117,7 @@ export const recommended = async (req, res) => {
 
   const tenantdb = await getTenantDB(tenant_id);
   const User = tenantdb.model("user", UserSchema);
-  const Post = tenantdb.model("post", PostSchema);
+  const Post = tenantdb.model("post", postSchema);
   tenantdb.model("interests", InterestSchema);
 
   try {
@@ -173,7 +173,7 @@ export const postId = async (req, res) => {
   const { populate } = req.query;
 
   const tenantdb = await getTenantDB(tenant_id);
-  const tenantPost = tenantdb.model("post", PostSchema);
+  const tenantPost = tenantdb.model("post", postSchema);
   tenantdb.model("interests", interestSchema);
 
   let post;
@@ -191,7 +191,7 @@ export const update = async (req, res) => {
   const { tenant_id } = req.headers;
 
   const tenantdb = await getTenantDB(tenant_id);
-  const tenantPost = tenantdb.model("post", PostSchema);
+  const tenantPost = tenantdb.model("post", postSchema);
 
   if (!isValidObjectId(id)) return sendError(res, "Post ID not valid", 404);
 
@@ -218,5 +218,24 @@ export const update = async (req, res) => {
   res.status(200).json({
     success: true,
     message: "Post updated successfully",
+  });
+};
+
+export const remove = async (req, res) => {
+  const { id } = req.params;
+  const { tenant_id } = req.headers;
+
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantPost = tenantdb.model("post", postSchema);
+
+  if (!isValidObjectId(id)) return sendError(res, "Post ID not valid", 404);
+
+  const post = await tenantPost.findById(id);
+  if (!post) return sendError(res, "Post not found", 404);
+
+  await tenantPost.findByIdAndDelete(id);
+
+  res.status(200).json({
+    message: "Post removed successfully",
   });
 };
