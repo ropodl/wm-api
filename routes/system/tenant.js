@@ -52,6 +52,7 @@ router.post("/", async (req, res) => {
     name,
     email,
     password: "admin123",
+    role: "admin",
   });
 
   await user.save();
