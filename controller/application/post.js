@@ -194,10 +194,8 @@ export const update = async (req, res) => {
 
   const post = await tenantPost.findById(id);
   if (!post) return sendError(res, "Post not found", 404);
-  console.log(title);
 
-  if (title !== post.title) post.slug = await slugify(title, tenantPost, res);
-
+  post.slug = await slugify(title, tenantPost, res);
   post.title = title;
   post.content = content;
   post.excerpt = excerpt;

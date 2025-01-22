@@ -16,6 +16,12 @@ const commentSchema = mongoose.Schema(
       required: true,
     },
     isSpam: { type: Boolean, default: false },
+    sentiment: {
+      type: String,
+      required: false,
+      enum: ["positive", "negative", "neutral"],
+      default: "neutral",
+    },
   },
   {
     timestamps: true,

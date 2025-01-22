@@ -8,21 +8,12 @@ export const create = async (req, res) => {
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantFeedback = tenantdb.model("feedback", feedbackSchema);
-  const Counter = tenantdb.model("counter", {
-    name: String,
-    value: Number,
-  });
+  let feedbackCount = await tenantFeedback.countDocuments();
 
-  let feedbackCounter = await Counter.findOne({ name: "feedbackTitle" });
-  if (!feedbackCounter)
-    feedbackCounter = new Counter({ name: "feedbackTitle", value: 0 });
-
-  feedbackCounter.value += 1;
-
-  await feedbackCounter.save();
+  feedbackCount += 1;
 
   const feedback = new tenantFeedback({
-    title: `Feedback #${feedbackCounter.value}`,
+    title: `Feedback #${feedbackCount}`,
     suggestions,
     ratings,
   });
@@ -30,7 +21,7 @@ export const create = async (req, res) => {
   await feedback.save();
 
   res.status(200).json({
-    message: "Feedback submitted",
+    message: "Thank you for submitting feedback",
   });
 };
 

@@ -5,6 +5,7 @@ import { sendError } from "../../utils/error.js";
 import { getTenantDB } from "../../utils/tenant.js";
 import UserSchema from "../../model/application/user.js";
 import forumSchema from "../../model/application/forum.js";
+import moderationSchema from "../../model/application/moderation.js";
 
 export const createThread = async (req, res) => {
   const { tenant_id } = req.headers;
@@ -278,25 +279,118 @@ export const getThreadComment = async (req, res) => {
 };
 
 export const createThreadComment = async (req, res) => {
-  const { tenant_id } = req.headers;
   const { content } = req.body;
-  const { tid } = req.params;
+  const { tenant_id } = req.headers;
   const { author_id } = req.query;
-
-  console.log(tid, "test");
+  const { tid } = req.params;
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantComment = tenantdb.model("comments", commentSchema);
 
+  const label = classifier.classify(content);
+  const isSpam = label === "spam";
+  const sentiment = isSpam ? "neutral" : label;
+
   const comment = new tenantComment({
-    thread: tid,
     content,
+    isSpam,
+    sentiment,
+    thread: tid,
     author: author_id,
   });
 
   await comment.save();
 
-  res.json({
-    a: "test",
+  res.status(201).json({ message: "Comment added" });
+};
+// ---------------------------------------------------
+class NaiveBayes {
+  constructor() {
+    this.labelCounts = {};
+    this.wordCounts = {};
+    this.totalDocuments = 0;
+  }
+
+  train(text, label) {
+    // Increment label count
+    this.labelCounts[label] = (this.labelCounts[label] || 0) + 1;
+    this.totalDocuments++;
+
+    // Tokenize text
+    const words = this.tokenize(text);
+
+    // Count words per label
+    this.wordCounts[label] = this.wordCounts[label] || {};
+    words.forEach((word) => {
+      this.wordCounts[label][word] = (this.wordCounts[label][word] || 0) + 1;
+    });
+  }
+
+  classify(text) {
+    const words = this.tokenize(text);
+    const scores = {};
+
+    for (const label in this.labelCounts) {
+      let score = Math.log(this.labelCounts[label] / this.totalDocuments);
+
+      words.forEach((word) => {
+        const wordCount = this.wordCounts[label]?.[word] || 0;
+        const totalWords = Object.values(this.wordCounts[label] || {}).reduce(
+          (a, b) => a + b,
+          0
+        );
+        const wordProbability = (wordCount + 1) / (totalWords + 1); // Add-one smoothing
+        score += Math.log(wordProbability);
+      });
+
+      scores[label] = score;
+    }
+
+    return Object.entries(scores).sort((a, b) => b[1] - a[1])[0][0];
+  }
+
+  tokenize(text) {
+    return text
+      .toLowerCase()
+      .split(/\W+/)
+      .filter((word) => word.length > 0);
+  }
+}
+const trainingData = [
+  { text: "Buy now!", label: "spam" },
+  { text: "Limited offer!", label: "spam" },
+  { text: "Great product", label: "positive" },
+  { text: "Terrible experience", label: "negative" },
+  { text: "Okay service", label: "neutral" },
+];
+
+export const commentAdd = async (req, res) => {
+  // try {
+  const { content } = req.body;
+  const { tenant_id } = req.headers;
+  const { author_id, tid } = req.query;
+
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantComment = tenantdb.model("comments", commentSchema);
+  const tenantForumMod = tenantdb.model("moderation", moderationSchema);
+
+  const classifier = new NaiveBayes();
+  trainingData.forEach(({ text, label }) => classifier.train(text, label));
+
+  const label = classifier.classify(content);
+  const isSpam = label === "spam";
+  const sentiment = isSpam ? "neutral" : label;
+  console.log(isSpam, sentiment, "asd");
+
+  const comment = new tenantComment({
+    content,
+    isSpam,
+    sentiment,
+    thread: tid,
+    author: author_id,
   });
+
+  await comment.save();
+
+  res.status(201).json({ message: "Comment added" });
 };

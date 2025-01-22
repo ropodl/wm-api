@@ -80,8 +80,7 @@ export const update = async (req, res) => {
   const interest = await tenantInterest.findById(id);
   if (!interest) return sendError(res, "Interest not found", 404);
 
-  if (title !== interest.title)
-    interest.slug = await slugify(title, tenantInterest, res);
+  interest.slug = await slugify(title, tenantInterest, res);
   interest.title = title;
   interest.description = description;
   interest.status = status;
