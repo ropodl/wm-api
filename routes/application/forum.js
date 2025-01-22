@@ -12,7 +12,6 @@ import {
   getThreadById,
   getThreadComment,
   createThreadComment,
-  commentAdd,
 } from "../../controller/application/thread.js";
 import { uploadImage } from "../../middleware/application/multer.js";
 
@@ -32,6 +31,6 @@ router.get("/:id/threads", getThread);
 router.get("/threads/:tid", getThreadById);
 router.get("/threads/:tid/comments", getThreadComment);
 // ----------------------------------------------------
-router.post("/comments/add", commentAdd);
+// router.post("/comments/add", commentAdd);
 
 export default router;

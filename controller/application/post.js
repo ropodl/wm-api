@@ -43,7 +43,7 @@ export const create = async (req, res) => {
 
 export const all = async (req, res) => {
   const { tenant_id } = req.headers;
-  const { page, itemsPerPage, sortBy, search } = req.query;
+  const { page, itemsPerPage, sortBy } = req.query;
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantPost = tenantdb.model("post", postSchema);
