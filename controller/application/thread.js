@@ -89,6 +89,7 @@ export const getThreadById = async (req, res) => {
 export const getThreadComment = async (req, res) => {
   const { tenant_id } = req.headers;
   const { page, itemsPerPage, sortBy } = req.query;
+  const { tid } = req.params;
 
   const tenantdb = await getTenantDB(tenant_id);
   tenantdb.model("user", UserSchema);
@@ -99,7 +100,7 @@ export const getThreadComment = async (req, res) => {
     tenantComment,
     page,
     itemsPerPage,
-    {},
+    { thread: tid },
     { createdAt: "-1" }
   );
 
@@ -181,7 +182,6 @@ class NaiveBayes {
       .filter((word) => word.length > 0);
   }
 }
-
 export const createThreadComment = async (req, res) => {
   const { content } = req.body;
   const { tenant_id } = req.headers;
@@ -220,32 +220,3 @@ export const createThreadComment = async (req, res) => {
 
   res.status(201).json({ message: "Comment added" });
 };
-// ---------------------------------------------------
-
-// export const commentAdd = async (req, res) => {
-//   // try {
-//   const { content } = req.body;
-//   const { tenant_id } = req.headers;
-//   const { author_id, tid } = req.query;
-
-//   const tenantdb = await getTenantDB(tenant_id);
-//   const tenantComment = tenantdb.model("comments", commentSchema);
-//   const tenantForumMod = tenantdb.model("moderation", moderationSchema);
-
-//   const label = classifier.classify(content);
-//   const isSpam = label === "spam";
-//   const sentiment = isSpam ? "neutral" : label;
-//   console.log(isSpam, sentiment, "asd");
-
-//   const comment = new tenantComment({
-//     content,
-//     isSpam,
-//     sentiment,
-//     thread: tid,
-//     author: author_id,
-//   });
-
-//   await comment.save();
-
-//   res.status(201).json({ message: "Comment added" });
-// };

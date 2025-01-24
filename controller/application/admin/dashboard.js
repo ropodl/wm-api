@@ -2,6 +2,7 @@ import forumSchema from "../../../model/application/forum.js";
 import interestSchema from "../../../model/application/interest.js";
 import postSchema from "../../../model/application/post.js";
 import threadSchema from "../../../model/application/thread.js";
+import { paginate } from "../../../utils/application/paginate.js";
 import { getTenantDB } from "../../../utils/tenant.js";
 
 export const all = async (req, res) => {
@@ -18,6 +19,14 @@ export const all = async (req, res) => {
   const total_forum = await tenantForum.countDocuments({});
   const total_thread = await tenantThread.countDocuments({});
 
+  const latest_posts = await paginate(
+    tenantPost,
+    1,
+    5,
+    {},
+    { createdAt: "-1" }
+  );
+
   res.status(200).json({
     stats_bar: {
       total_post,
@@ -25,5 +34,6 @@ export const all = async (req, res) => {
       total_forum,
       total_thread,
     },
+    latest_posts,
   });
 };
