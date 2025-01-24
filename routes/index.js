@@ -8,6 +8,7 @@ import jwt from "jsonwebtoken";
 import "dotenv";
 import { sendError } from "../utils/error.js";
 import { isValidSubdomain } from "../utils/application/subdomain.js";
+import { log } from "console";
 // import { migrate } from "../controller/application/post.js";
 
 const router = express.Router();
@@ -17,15 +18,18 @@ router.post("/auth/login", async (req, res) => {
   const { email, password } = req.body;
   const { origin } = req.headers;
 
-  const sub = isValidSubdomain(origin)
+  const sub = isValidSubdomain(origin);
+
+  console.log(sub, "is sub");
 
   if (sub) {
     const tenant_id = `tenant_${sub}`;
-    console.log(tenant_id,"tenant_id");
+    console.log(tenant_id, "tenant_id");
     const tenantdb = await getTenantDB(tenant_id);
     const tenantUser = tenantdb.model("user", tenantUserSchema);
 
     const user = await tenantUser.findOne({ email });
+    console.log(user);
     if (!user) return sendError(res, "Email/Password do not match");
 
     const matched = await user.comparePassword(password);
@@ -37,8 +41,10 @@ router.post("/auth/login", async (req, res) => {
       token,
     });
   }
+  console.log(email, password);
 
   const user = await UserSchema.findOne({ email });
+  console.log(user);
   if (!user) return sendError(res, "Email/Password do not match");
 
   const matched = await user.comparePassword(password);
@@ -63,13 +69,13 @@ router.get("/auth/session", async (req, res) => {
     expiresIn: "1d",
   });
 
-  if(!origin) return sendError(res, "Invalid Source");
-  
-  const sub = isValidSubdomain(origin)
+  if (!origin) return sendError(res, "Invalid Source");
+
+  const sub = isValidSubdomain(origin);
 
   if (sub) {
     console.log("session");
-    
+
     const tenant_id = `tenant_${sub}`;
 
     const tenantdb = await getTenantDB(tenant_id);

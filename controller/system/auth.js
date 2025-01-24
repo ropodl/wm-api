@@ -26,6 +26,8 @@ export const login = async (req, res) => {
   const { email, password } = req.body;
 
   const user = await UserSchema.findOne({ email });
+  console.log(user, "this is lord user");
+
   if (!user) return sendError(res, "Email/Password do not match");
 
   const matched = await user.comparePassword(password);
