@@ -12,6 +12,7 @@ export const login = async (req, res) => {
   const tenantUser = tenantdb.model("user", UserSchema);
 
   const user = await tenantUser.findOne({ email });
+  console.log(user, "this is user");
   if (!user) return sendError(res, "Email/Password do not match");
 
   const matched = await user.comparePassword(password);
