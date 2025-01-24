@@ -4,8 +4,8 @@ import {
   create,
   postId,
   recommended,
-  remove,
   update,
+  remove,
 } from "../../controller/application/post.js";
 import { uploadImage } from "../../middleware/application/multer.js";
 
