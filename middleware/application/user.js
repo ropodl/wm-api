@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import userSchema from "../../model/application/user.js";
 import { getTenantDB } from "../../utils/tenant.js";
 import interestSchema from "../../model/application/interest.js";
+import { sendError } from "../../utils/error.js";
 
 export async function isAuth(req, res, next) {
   const authHeader = req.headers?.authorization;
@@ -30,6 +31,7 @@ export async function isAuth(req, res, next) {
 
 export async function isAdmin(req, res, next) {
   const { user } = req;
+  console.log(user);
   if (user.role !== "admin") return sendError(res, "Unauthorized Access");
   next();
 }

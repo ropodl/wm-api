@@ -17,6 +17,7 @@ export const create = async (req, res) => {
   const tenantdb = await getTenantDB(tenant_id);
   const tenantPost = tenantdb.model("post", postSchema);
 
+  if (!file) return sendError(res, "Image is required", 404);
   const image = {
     url: imgUrl(req, res, file),
     name: file.filename,

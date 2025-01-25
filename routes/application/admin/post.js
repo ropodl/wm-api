@@ -5,8 +5,8 @@ import {
   postId,
   update,
   remove,
-} from "../../controller/application/post.js";
-import { uploadImage } from "../../middleware/application/multer.js";
+} from "../../../controller/application/post.js";
+import { uploadImage } from "../../../middleware/application/multer.js";
 
 const router = express.Router();
 

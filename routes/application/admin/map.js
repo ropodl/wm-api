@@ -4,16 +4,17 @@ import {
   all,
   id,
   remove,
-  search,
+  update,
 } from "../../../controller/application/admin/map.js";
 
 const router = express.Router();
 
 router.post("/", create);
 
+router.patch("/:id", update);
+
 router.get("/", all);
 router.get("/:id", id);
-router.get("/search", search);
 
 router.delete("/:id", remove);
 
