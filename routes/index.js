@@ -8,8 +8,6 @@ import jwt from "jsonwebtoken";
 import "dotenv";
 import { sendError } from "../utils/error.js";
 import { isValidSubdomain } from "../utils/application/subdomain.js";
-import { log } from "console";
-// import { migrate } from "../controller/application/post.js";
 
 const router = express.Router();
 
@@ -109,8 +107,6 @@ router.get("/auth/session", async (req, res) => {
 
 router.use("/system", system);
 router.use("/", application);
-
-// router.use("/m", migrate)
 
 router.use("/version-check/", (req, res) => {
   res.json({

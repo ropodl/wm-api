@@ -1,5 +1,5 @@
 import express from "express";
-import user from "./user.js";
+import user from "./user/index.js";
 import post from "./post.js";
 import interest from "./interest.js";
 import auth from "./auth.js";

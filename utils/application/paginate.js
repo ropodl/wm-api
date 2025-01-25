@@ -21,9 +21,9 @@ export async function paginate(
       documents,
       pagination: {
         totalPage: 1,
-        totalItems,
-        itemsPerPage: totalItems,
-        currentPage: page,
+        totalItems: parseInt(totalItems),
+        itemsPerPage: parseInt(totalItems),
+        currentPage: parseInt(page),
       },
     };
   }
@@ -39,10 +39,10 @@ export async function paginate(
   return {
     documents,
     pagination: {
-      totalPage,
-      totalItems,
-      itemsPerPage,
-      currentPage: page,
+      totalPage: parseInt(totalPage),
+      totalItems: parseInt(totalItems),
+      itemsPerPage: parseInt(itemsPerPage),
+      currentPage: parseInt(page),
     },
   };
 }

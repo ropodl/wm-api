@@ -139,8 +139,10 @@ export const recommended = async (req, res) => {
         const similarity = cosineSimilarity(userInterestIds, postTagIds);
         return { post, similarity };
       })
-      .filter((item) => item.similarity > 0) // Filter out posts with zero similarity
-      .sort((a, b) => b.similarity - a.similarity); // Sort by similarity in descending order
+      // Filter out posts with zero similarity
+      .filter((item) => item.similarity > 0)
+      // Sort by similarity in descending order
+      .sort((a, b) => b.similarity - a.similarity);
 
     // Pagination logic
     const totalItems = similarPosts.length;
