@@ -1,3 +1,4 @@
+import interestSchema from "../../../model/application/interest.js";
 import postSchema from "../../../model/application/post.js";
 import { paginate } from "../../../utils/application/paginate.js";
 import { getTenantDB } from "../../../utils/tenant.js";
@@ -19,15 +20,11 @@ export const latest = async (req, res) => {
 
   const posts = await Promise.all(
     paginatedPosts.documents.map(async (post) => {
-      const { id, title, excerpt, content, image, slug, status } = await post;
+      const { title, image, slug } = await post;
       return {
-        id,
         title,
-        excerpt,
-        content,
         image,
         slug,
-        status,
       };
     })
   );
@@ -36,4 +33,18 @@ export const latest = async (req, res) => {
     posts,
     pagination: paginatedPosts.pagination,
   });
+};
+
+export const slug = async (req, res) => {
+  const { tenant_id } = req.headers;
+  const { slug } = req.params;
+
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantPost = tenantdb.model("post", postSchema);
+  tenantdb.model("interests", interestSchema);
+
+  const post = await tenantPost.findOne({ slug }).populate("tags");
+  if (!post) return sendError(res, "Invalid request, Post not found", 404);
+
+  res.json(post);
 };
