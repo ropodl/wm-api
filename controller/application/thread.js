@@ -21,6 +21,8 @@ export const createThread = async (req, res) => {
     title,
     content,
     author: user_id,
+    upvote: { count: 0, by: [] },
+    downvote: { count: 0, by: [] },
   });
 
   const { id: tid } = await thread.save();
@@ -31,8 +33,6 @@ export const createThread = async (req, res) => {
 };
 
 export const getThread = async (req, res) => {
-  console.log("this is a test");
-
   const { tenant_id } = req.headers;
   const { id } = req.params;
 
@@ -55,13 +55,16 @@ export const getThread = async (req, res) => {
         .findById(thread._id)
         .populate("author", "name email image")
         .populate("forum");
-      const { id, title, content, author, createdAt } = populatedThread;
+      const { id, title, content, author, createdAt, upvote, downvote } =
+        populatedThread;
       return {
         id,
         title,
         content,
         author,
         createdAt,
+        upvote: upvote.count,
+        downvote: downvote.count,
       };
     })
   );
@@ -75,12 +78,13 @@ export const getThread = async (req, res) => {
 export const getThreadById = async (req, res) => {
   console.log("why");
   const { tenant_id } = req.headers;
-  const { id, tid } = req.params;
+  const { tid } = req.params;
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantThread = tenantdb.model("threads", threadSchema);
+  tenantdb.model("user", UserSchema);
 
-  const thread = await tenantThread.findById({ _id: tid });
+  const thread = await tenantThread.findById({ _id: tid }).populate("author");
   if (!thread) return sendError(res, "Invalid request, Thread not found", 404);
 
   res.json(thread);
@@ -111,7 +115,7 @@ export const getThreadComment = async (req, res) => {
         .findById(comment._id)
         .populate("author", "name email image")
         .populate("thread");
-      const { id, content, author, thread, sentiment, isSpam } =
+      const { id, content, author, thread, sentiment, isSpam, updatedAt } =
         populatedComment;
       return {
         id,
@@ -120,6 +124,7 @@ export const getThreadComment = async (req, res) => {
         thread,
         sentiment,
         isSpam,
+        updatedAt,
       };
     })
   );
@@ -198,15 +203,15 @@ export const createThreadComment = async (req, res) => {
     ...moderation.negative,
     ...moderation.spam,
   ];
-  console.log(trainingData);
 
   const classifier = new NaiveBayes();
 
   trainingData.forEach(({ text, label }) => classifier.train(text, label));
 
   const label = classifier.classify(content);
+
   const isSpam = label === "spam";
-  const sentiment = isSpam ? "neutral" : label;
+  const sentiment = label || "neutral";
 
   const comment = new tenantComment({
     content,
@@ -214,9 +219,11 @@ export const createThreadComment = async (req, res) => {
     sentiment,
     thread: tid,
     author: author_id,
+    upvote: { count: 0, by: [] },
+    downvote: { count: 0, by: [] },
   });
 
   await comment.save();
 
-  res.status(201).json({ message: "Comment added" });
+  res.status(201).json({ message: "Comment added successfully" });
 };

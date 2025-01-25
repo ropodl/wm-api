@@ -3,8 +3,6 @@ import { getTenantDB } from "../../utils/tenant.js";
 import postSchema from "../../model/application/post.js";
 import { imgUrl } from "../../utils/common/generateImgUrl.js";
 import { slugify } from "../../utils/common/slugify.js";
-import InterestSchema from "../../model/application/interest.js";
-import UserSchema from "../../model/application/user.js";
 import { sendError } from "../../utils/error.js";
 import interestSchema from "../../model/application/interest.js";
 import { isValidObjectId } from "mongoose";

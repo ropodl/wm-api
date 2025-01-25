@@ -8,8 +8,26 @@ const commentSchema = mongoose.Schema(
       required: true,
     },
     content: { type: String, required: true },
-    upvote: { type: Number, default: 0 },
-    downvote: { type: Number, default: 0 },
+    upvote: {
+      count: { type: Number, default: 0 },
+      by: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "user",
+          default: [],
+        },
+      ],
+    },
+    downvote: {
+      count: { type: Number, default: 0 },
+      by: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "user",
+          default: [],
+        },
+      ],
+    },
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
