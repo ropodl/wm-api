@@ -3,7 +3,6 @@ import {
   all,
   create,
   postId,
-  recommended,
   update,
   remove,
 } from "../../controller/application/post.js";
@@ -15,7 +14,7 @@ router.post("/", uploadImage.single("image"), create);
 router.patch("/:id", uploadImage.single("image"), update);
 
 router.get("/latest", all);
-router.get("/recommended/:id", recommended);
+// router.get("/recommended/:id", recommended);
 router.get("/:id", postId);
 
 router.delete("/:id", remove);
