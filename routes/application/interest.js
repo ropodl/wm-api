@@ -7,6 +7,7 @@ import {
   getInterestById,
   update,
   remove,
+  removeUserInterest,
 } from "../../controller/application/interest.js";
 
 const router = express.Router();
@@ -18,6 +19,7 @@ router.get("/:id", getInterestById);
 router.post("/", create);
 
 router.patch("/add-user-interest", addUserInterest);
+router.patch("/remove-interest", removeUserInterest);
 router.patch("/:id", update);
 
 router.delete("/:id", remove);
