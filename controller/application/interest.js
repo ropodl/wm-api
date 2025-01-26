@@ -121,10 +121,9 @@ export const removeUserInterest = async (req, res) => {
   const tenantUser = tenantdb.model("user", UserSchema);
 
   const user = await tenantUser.findOne({ _id: user_id });
-  // const interests = user.interests;
-  console.log(user);
-  // if (interests.includes(interest_id))
-  //   return sendError(res, "Interests already existes", 400);
+  if (!user.interests.includes(interest_id)) {
+    return sendError(res, "Interest does not exist for this user", 400);
+  }
   user.interests = user.interests.filter(
     (interest) => interest.toString() !== interest_id
   );
