@@ -140,6 +140,9 @@ router.post("/auth/change-password", isAuth, async (req, res) => {
   const user = await tenantUser.findById({ _id: id });
   if (!user) return sendError(res, "User not found", 404);
 
+  const isMatch = await user.comparePassword(current);
+  if (!isMatch) return sendError(res, "Current password is incorrect", 400);
+
   user.password = newer;
 
   await user.save();
