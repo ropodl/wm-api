@@ -4,24 +4,32 @@ import { sendError } from "../../../utils/error.js";
 import { getTenantDB } from "../../../utils/tenant.js";
 import { imgUrl } from "../../../utils/common/generateImgUrl.js";
 import bcrypt from "bcrypt";
+import threadSchema from "../../../model/application/thread.js";
+import commentSchema from "../../../model/application/comment.js";
 
 export const dashboard = async (req, res) => {
   const { tenant_id } = req.headers;
   const { id } = req.params;
+  const { user } = req;
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantUser = tenantdb.model("user", userSchema);
+  const tenantComment = tenantdb.model("comment", commentSchema);
+  const tenantThread = tenantdb.model("thread", threadSchema);
 
-  const { name, email, interests, image, user_name, phone_number } =
-    await tenantUser.findById(id);
+  const old = await tenantUser.findById({ _id: user.id });
+  if (!old) return sendError(res, "User not found", 404);
+
+  const total_threads = await tenantThread.countDocuments({ author: user.id });
+  const total_comments = await tenantComment.countDocuments({
+    author: user.id,
+  });
+  const total_interests = old.interests.length;
 
   res.json({
-    name,
-    email,
-    interests,
-    image,
-    user_name,
-    phone_number,
+    total_interests,
+    total_threads,
+    total_comments,
   });
 };
 
