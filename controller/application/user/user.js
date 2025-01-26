@@ -92,25 +92,31 @@ export const password = async (req, res) => {
   const { tenant_id } = req.headers;
   const { current, newer } = req.body;
 
-  const tenantdb = await getTenantDB(tenant_id);
-  const tenantUser = tenantdb.model("user", userSchema);
+  try {
+    // Get the tenant database
+    const tenantdb = await getTenantDB(tenant_id);
+    const tenantUser = tenantdb.model("user", userSchema);
 
-  if (!isValidObjectId(id)) return sendError(res, "User ID not valid", 404);
+    // Validate user ID
+    if (!isValidObjectId(id)) return sendError(res, "User ID not valid", 404);
 
-  const user = await tenantUser.findById({ _id: id });
-  if (!user) return sendError(res, "User not found", 404);
+    // Find the user by ID
+    const user = await tenantUser.findById(id);
+    if (!user) return sendError(res, "User not found", 404);
 
-  const isMatch = await bcrypt.compare(current, user.password);
-  if (!isMatch) return sendError(res, "Current password is incorrect", 400);
-  console.log(newer);
-  const hashedPassword = await bcrypt.hash(newer, 14);
-  console.log(hashedPassword);
-  console.log(user.password);
-  user.password = hashedPassword;
+    // Compare current password
+    const isMatch = await bcrypt.compare(current, user.password);
+    if (!isMatch) return sendError(res, "Current password is incorrect", 400);
 
-  await user.save();
+    // Update with a new hashed password
+    user.password = newer; // If a pre-save hook exists, this is enough
+    await user.save(); // Pre-save hook will hash the password here
 
-  res.status(200).json({
-    message: "Password updated successfully",
-  });
+    res.status(200).json({
+      message: "Password updated successfully",
+    });
+  } catch (error) {
+    console.error("Error in password update:", error);
+    sendError(res, "Something went wrong", 500);
+  }
 };
