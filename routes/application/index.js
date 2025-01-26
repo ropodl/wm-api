@@ -8,6 +8,8 @@ import { isAdmin, isAuth } from "../../middleware/application/user.js";
 
 const router = express.Router();
 
+router.use("/auth", auth);
+
 router.use("/admin", isAuth, isAdmin, admin);
 
 router.use("/user", isAuth, user);

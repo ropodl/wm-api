@@ -52,6 +52,30 @@ export const me = async (req, res) => {
   });
 };
 
+export const signup = async (req, res) => {
+  const { name, user_name, email, password } = req.body;
+  const { tenant_id } = req.headers;
+
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantUser = tenantdb.model("user", UserSchema);
+
+  const old = await tenantUser.findOne({ email });
+  if (old) return sendError(res, "User with given email already exists");
+
+  const user = new tenantUser({
+    name,
+    user_name,
+    email,
+    password,
+  });
+
+  await user.save();
+
+  res.status(200).json({
+    message: "Registered successfully",
+  });
+};
+
 export const changePassword = async (req, res) => {
   const { user_id } = req.params;
   const { current, newer } = req.body;

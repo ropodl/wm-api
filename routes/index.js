@@ -8,17 +8,15 @@ import jwt from "jsonwebtoken";
 import "dotenv";
 import { sendError } from "../utils/error.js";
 import { isValidSubdomain } from "../utils/application/subdomain.js";
+import { isAuth } from "../middleware/application/user.js";
 
 const router = express.Router();
 
 router.post("/auth/login", async (req, res) => {
-  console.log("this is auth");
   const { email, password } = req.body;
   const { origin } = req.headers;
 
   const sub = isValidSubdomain(origin);
-
-  console.log(sub, "is sub");
 
   if (sub) {
     const tenant_id = `tenant_${sub}`;
@@ -102,6 +100,52 @@ router.get("/auth/session", async (req, res) => {
   res.json({
     user: { name, email, image },
     role: "lord",
+  });
+});
+
+router.post("/auth/signup", async (req, res) => {
+  const { name, user_name, email, password } = req.body;
+  const { tenant_id } = req.headers;
+
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantUser = tenantdb.model("user", tenantUserSchema);
+
+  const old = await tenantUser.findOne({ email });
+  if (old) return sendError(res, "User with given email already exists");
+
+  const user = new tenantUser({
+    name,
+    user_name,
+    email,
+    password,
+  });
+
+  await user.save();
+
+  res.status(200).json({
+    message: "Registered successfully",
+  });
+});
+
+router.post("/auth/change-password", isAuth, async (req, res) => {
+  const {
+    user: { id },
+  } = req;
+  const { current, newer } = req.body;
+  const { tenant_id } = req.headers;
+
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantUser = tenantdb.model("user", tenantUserSchema);
+
+  const user = await tenantUser.findById({ _id: id });
+  if (!user) return sendError(res, "User not found", 404);
+
+  user.password = newer;
+
+  await user.save();
+
+  res.status(200).json({
+    message: "Password changed successfully",
   });
 });
 

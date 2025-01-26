@@ -1,8 +1,8 @@
-import { Router } from "express";
+import express from "express";
 import { login, me } from "../../controller/application/auth.js";
 import { isAuth } from "../../middleware/application/user.js";
 
-const router = Router();
+const router = express.Router();
 
 router.get("/me", isAuth, me);
 
