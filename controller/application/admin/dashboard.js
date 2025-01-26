@@ -27,6 +27,14 @@ export const all = async (req, res) => {
     { createdAt: "-1" }
   );
 
+  const latest_interest = await paginate(
+    tenantInterest,
+    1,
+    5,
+    {},
+    { createdAt: "-1" }
+  );
+
   res.status(200).json({
     stats_bar: {
       total_post,
@@ -35,5 +43,6 @@ export const all = async (req, res) => {
       total_thread,
     },
     latest_posts,
+    latest_interest,
   });
 };

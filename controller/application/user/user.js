@@ -5,6 +5,26 @@ import { getTenantDB } from "../../../utils/tenant.js";
 import { imgUrl } from "../../../utils/common/generateImgUrl.js";
 import bcrypt from "bcrypt";
 
+export const dashboard = async (req, res) => {
+  const { tenant_id } = req.headers;
+  const { id } = req.params;
+
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantUser = tenantdb.model("user", userSchema);
+
+  const { name, email, interests, image, user_name, phone_number } =
+    await tenantUser.findById(id);
+
+  res.json({
+    name,
+    email,
+    interests,
+    image,
+    user_name,
+    phone_number,
+  });
+};
+
 export const id = async (req, res) => {
   const { tenant_id } = req.headers;
   const { id } = req.params;
