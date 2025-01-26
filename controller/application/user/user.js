@@ -102,8 +102,10 @@ export const password = async (req, res) => {
 
   const isMatch = await bcrypt.compare(current, user.password);
   if (!isMatch) return sendError(res, "Current password is incorrect", 400);
-
-  const hashedPassword = await bcrypt.hash(newer, 10);
+  console.log(newer);
+  const hashedPassword = await bcrypt.hash(newer, 14);
+  console.log(hashedPassword);
+  console.log(user.password);
   user.password = hashedPassword;
 
   await user.save();
