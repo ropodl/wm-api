@@ -47,6 +47,10 @@ export const update = async (req, res) => {
 
   res.status(200).json({
     message: "User profile updated successfully",
+    name,
+    email,
+    phone_number,
+    user_name,
   });
 };
 
@@ -87,7 +91,6 @@ export const password = async (req, res) => {
   } = req;
   const { tenant_id } = req.headers;
   const { current, newer } = req.body;
-  console.log(id, current, newer);
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantUser = tenantdb.model("user", userSchema);
@@ -96,8 +99,6 @@ export const password = async (req, res) => {
 
   const user = await tenantUser.findById({ _id: id });
   if (!user) return sendError(res, "User not found", 404);
-
-  console.log(user.password);
 
   const isMatch = await bcrypt.compare(current, user.password);
   if (!isMatch) return sendError(res, "Current password is incorrect", 400);
