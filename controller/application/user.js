@@ -5,9 +5,20 @@ import { sendError } from "../../utils/error.js";
 import { getTenantDB } from "../../utils/tenant.js";
 
 export const create = async (req, res) => {
-  const { name, email, password, role, interests, phone_number, user_name } =
-    req.body;
+  const {
+    name,
+    email,
+    password,
+    role,
+    interests,
+    phone_number,
+    user_name,
+    lat,
+    long,
+  } = req.body;
   const { tenant_id } = req.headers;
+
+  console.log("this is test");
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantUser = tenantdb.model("users", UserSchema);

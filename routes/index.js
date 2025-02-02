@@ -104,7 +104,7 @@ router.get("/auth/session", async (req, res) => {
 });
 
 router.post("/auth/signup", async (req, res) => {
-  const { name, user_name, email, password } = req.body;
+  const { name, user_name, email, password, latitude, longitude } = req.body;
   const { tenant_id } = req.headers;
 
   const tenantdb = await getTenantDB(tenant_id);
@@ -118,6 +118,8 @@ router.post("/auth/signup", async (req, res) => {
     user_name,
     email,
     password,
+    latitude,
+    longitude,
   });
 
   await user.save();
