@@ -12,11 +12,8 @@ export const create = async (req, res) => {
   const tenantdb = await getTenantDB(tenant_id);
   const tenantMap = tenantdb.model("map", mapSchema);
 
-  const slug = await slugify(name, tenantMap, res);
-
   const map = new tenantMap({
     name,
-    slug,
     iframe,
     status,
   });
@@ -45,11 +42,10 @@ export const all = async (req, res) => {
 
   const maps = await Promise.all(
     paginatedMaps.documents.map(async (map) => {
-      const { id, name, slug, iframe, status } = await map;
+      const { id, name, iframe, status } = await map;
       return {
         id,
         name,
-        slug,
         iframe,
         status,
       };
@@ -92,7 +88,6 @@ export const update = async (req, res) => {
 
   map.name = name;
   map.iframe = iframe;
-  map.status = status;
 
   await map.save();
 
