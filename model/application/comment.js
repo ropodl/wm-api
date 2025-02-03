@@ -37,7 +37,7 @@ const commentSchema = mongoose.Schema(
     sentiment: {
       type: String,
       required: false,
-      enum: ["positive", "negative", "neutral"],
+      enum: ["positive", "negative", "neutral", "spam"],
       default: "neutral",
     },
   },

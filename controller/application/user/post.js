@@ -107,6 +107,7 @@ export const recommendation = async (req, res) => {
       .map((post) => {
         const postTagIds = post.tags.map((tag) => tag._id.toString());
         const similarity = cosineSimilarity(userInterestIds, postTagIds);
+        //console.log(similarity);
         return {
           title: post.title,
           image: post.image,
