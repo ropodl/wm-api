@@ -51,35 +51,35 @@ export const slug = async (req, res) => {
   res.json(post);
 };
 
-const cosineSimilarity = (userInterests, postTags) => {
-  // Create a set of all unique interest IDs in both arrays
-  const allInterests = new Set([...userInterests, ...postTags]);
+// const cosineSimilarity = (userInterests, postTags) => {
+//   // Create a set of all unique interest IDs in both arrays
+//   const allInterests = new Set([...userInterests, ...postTags]);
 
-  // Convert interests and tags into binary vectors
-  const userVector = Array.from(allInterests).map((interestId) =>
-    userInterests.includes(interestId) ? 1 : 0
-  );
-  const postVector = Array.from(allInterests).map((interestId) =>
-    postTags.includes(interestId) ? 1 : 0
-  );
+//   // Convert interests and tags into binary vectors
+//   const userVector = Array.from(allInterests).map((interestId) =>
+//     userInterests.includes(interestId) ? 1 : 0
+//   );
+//   const postVector = Array.from(allInterests).map((interestId) =>
+//     postTags.includes(interestId) ? 1 : 0
+//   );
 
-  // Calculate dot product and magnitudes of the vectors
-  const dotProduct = userVector.reduce(
-    (sum, val, i) => sum + val * postVector[i],
-    0
-  );
-  const userMagnitude = Math.sqrt(
-    userVector.reduce((sum, val) => sum + val * val, 0)
-  );
-  const postMagnitude = Math.sqrt(
-    postVector.reduce((sum, val) => sum + val * val, 0)
-  );
+//   // Calculate dot product and magnitudes of the vectors
+//   const dotProduct = userVector.reduce(
+//     (sum, val, i) => sum + val * postVector[i],
+//     0
+//   );
+//   const userMagnitude = Math.sqrt(
+//     userVector.reduce((sum, val) => sum + val * val, 0)
+//   );
+//   const postMagnitude = Math.sqrt(
+//     postVector.reduce((sum, val) => sum + val * val, 0)
+//   );
 
-  // Calculate cosine similarity
-  return userMagnitude && postMagnitude
-    ? dotProduct / (userMagnitude * postMagnitude)
-    : 0;
-};
+//   // Calculate cosine similarity
+//   return userMagnitude && postMagnitude
+//     ? dotProduct / (userMagnitude * postMagnitude)
+//     : 0;
+// };
 
 export const recommendation = async (req, res) => {
   const { tenant_id } = req.headers;
@@ -140,4 +140,69 @@ export const recommendation = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Server error" });
   }
+};
+
+// Recommendation system
+export const getSimilarPosts = async (req, res) => {
+  const { tenant_id } = req.headers;
+  const { id } = req.params;
+  const tenantdb = await getTenantDB(tenant_id);
+  const tenantPost = tenantdb.model("post", postSchema);
+  tenantdb.model("interests", interestSchema);
+
+  // Fetch all posts including tags
+  const posts = await tenantPost.find({ status: "Published" }).populate("tags");
+
+  // Find the target post
+  const targetPost = await tenantPost.findById(id);
+  console.log(targetPost);
+  if (!targetPost) return res.status(404).json({ error: "Post not found" });
+
+  // Convert target post to vector
+  const targetText = `${targetPost.title} ${targetPost.excerpt} ${
+    targetPost.content
+  } ${targetPost.tags.map((t) => t._id.toString()).join(" ")}`;
+  const targetVector = tokenizeAndVectorize(targetText);
+
+  // Compute similarity for each post
+  const recommendations = posts
+    .map((post) => {
+      if (post._id.toString() === id) return null;
+      const postText = `${post.title} ${post.excerpt} ${
+        post.content
+      } ${post.tags.map((t) => t._id.toString()).join(" ")}`;
+      console.log(postText);
+      const postVector = tokenizeAndVectorize(postText);
+      return {
+        post,
+        similarity: cosineSimilarity(targetVector, postVector),
+      };
+    })
+    .filter(Boolean) // Remove null values
+    .sort((a, b) => b.similarity - a.similarity)
+    .slice(0, 4); // Get top 4 recommendations
+
+  res.json(recommendations.map((r) => r.post));
+};
+// Function to tokenize and count word frequencies
+const tokenizeAndVectorize = (text) => {
+  const words = text.toLowerCase().match(/\b[a-z0-9]+\b/g) || [];
+  return words.reduce((acc, word) => {
+    acc[word] = (acc[word] || 0) + 1;
+    return acc;
+  }, {});
+};
+
+// Function to compute cosine similarity
+const cosineSimilarity = (vectorA, vectorB) => {
+  const allWords = new Set([...Object.keys(vectorA), ...Object.keys(vectorB)]);
+
+  const vecA = Array.from(allWords).map((word) => vectorA[word] || 0);
+  const vecB = Array.from(allWords).map((word) => vectorB[word] || 0);
+
+  const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+  const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a ** 2, 0));
+  const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b ** 2, 0));
+
+  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
 };

@@ -100,10 +100,6 @@ export const addUserInterest = async (req, res) => {
   const tenantUser = tenantdb.model("user", UserSchema);
 
   const user = await tenantUser.findOne({ _id: user_id });
-  // const interests = user.interests;
-  console.log(user);
-  // if (interests.includes(interest_id))
-  //   return sendError(res, "Interests already existes", 400);
 
   user.interests.push(interest_id);
   await user.save();

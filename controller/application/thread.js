@@ -170,7 +170,7 @@ class NaiveBayes {
           (a, b) => a + b,
           0
         );
-        const wordProbability = (wordCount + 1) / (totalWords + 1); // Add-one smoothing
+        const wordProbability = (wordCount + 1) / (totalWords + 1);
         score += Math.log(wordProbability);
       });
 

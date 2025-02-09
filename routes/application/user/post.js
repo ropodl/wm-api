@@ -3,12 +3,13 @@ import {
   latest,
   slug,
   recommendation,
+  getSimilarPosts,
 } from "../../../controller/application/user/post.js";
 
 const router = express.Router();
 
 router.get("/", latest);
-router.get("/recommendation", recommendation);
+router.get("/recommendation/:id", getSimilarPosts);
 router.get("/:slug", slug);
 
 export default router;
