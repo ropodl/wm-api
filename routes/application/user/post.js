@@ -2,7 +2,6 @@ import express from "express";
 import {
   latest,
   slug,
-  recommendation,
   getSimilarPosts,
 } from "../../../controller/application/user/post.js";
 

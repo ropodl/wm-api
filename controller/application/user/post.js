@@ -112,48 +112,104 @@ export const recommendation = async (req, res) => {
   }
 };
 
-// Recommendation system
 export const getSimilarPosts = async (req, res) => {
   const { tenant_id } = req.headers;
   const { id } = req.params;
+  const { page = 1, itemsPerPage = 10 } = req.query;
+
   const tenantdb = await getTenantDB(tenant_id);
   const tenantPost = tenantdb.model("post", postSchema);
   tenantdb.model("interests", interestSchema);
 
-  // Fetch all posts including tags
-  const posts = await tenantPost.find({ status: "Published" }).populate("tags");
+  try {
+    // Fetch the target post
+    const targetPost = await tenantPost.findById(id).populate("tags");
+    if (!targetPost) return sendError(res, "Post not found", 404);
 
-  // Find the target post
-  const targetPost = await tenantPost.findById(id);
-  console.log(targetPost);
-  if (!targetPost) return res.status(404).json({ error: "Post not found" });
+    // Fetch all published posts
+    const posts = await tenantPost
+      .find({ status: "Published" })
+      .populate("tags");
 
-  // Convert target post to vector
-  const targetText = `${targetPost.title} ${targetPost.excerpt} ${
-    targetPost.content
-  } ${targetPost.tags.map((t) => t._id.toString()).join(" ")}`;
-  const targetVector = tokenizeAndVectorize(targetText);
+    // Prepare the text corpus (all posts content)
+    const corpus = posts.map(
+      (post) =>
+        `${post.title} ${post.excerpt} ${post.content} ${post.tags
+          .map((t) => t._id.toString())
+          .join(" ")}`
+    );
 
-  // Compute similarity for each post
-  const recommendations = posts
-    .map((post) => {
-      if (post._id.toString() === id) return null;
-      const postText = `${post.title} ${post.excerpt} ${
-        post.content
-      } ${post.tags.map((t) => t._id.toString()).join(" ")}`;
-      console.log(postText);
-      const postVector = tokenizeAndVectorize(postText);
-      return {
-        post,
-        similarity: cosineSimilarity(targetVector, postVector),
-      };
-    })
-    .filter(Boolean) // Remove null values
-    .sort((a, b) => b.similarity - a.similarity)
-    .slice(0, 4); // Get top 4 recommendations
+    // Compute TF-IDF for the entire corpus
+    const tfidfVectors = computeTFIDF(corpus);
 
-  res.json(recommendations.map((r) => r.post));
+    // Get the index of the target post
+    const targetIndex = posts.findIndex((post) => post._id.toString() === id);
+    if (targetIndex === -1)
+      return sendError(res, "Target post not found in corpus", 404);
+
+    const targetVector = tfidfVectors[targetIndex];
+
+    // Compute similarity for each post
+    const similarPosts = posts
+      .map((post, index) => {
+        if (index === targetIndex) return null; // Skip self
+        return {
+          title: post.title,
+          image: post.image,
+          slug: post.slug,
+          similarity: cosineSimilarity(targetVector, tfidfVectors[index]),
+        };
+      })
+      .filter(Boolean) // Remove nulls
+      .filter((post) => post.similarity > 0) // Remove non-similar posts
+      .sort((a, b) => b.similarity - a.similarity); // Sort by similarity
+
+    // Pagination logic
+    const totalItems = similarPosts.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const offset = (page - 1) * itemsPerPage;
+    const paginatedPosts = similarPosts.slice(offset, offset + itemsPerPage);
+
+    res.json({
+      posts: paginatedPosts,
+      pagination: {
+        totalItems,
+        totalPages,
+        itemsPerPage: parseInt(itemsPerPage),
+        currentPage: parseInt(page),
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
 };
+
+// Function to compute TF-IDF vectors
+const computeTFIDF = (documents) => {
+  const wordCounts = documents.map(tokenizeAndVectorize);
+  const documentCount = documents.length;
+
+  // Compute DF (Document Frequency)
+  const df = {};
+  wordCounts.forEach((doc) => {
+    Object.keys(doc).forEach((word) => {
+      df[word] = (df[word] || 0) + 1;
+    });
+  });
+
+  // Compute TF-IDF
+  return wordCounts.map((doc) => {
+    const tfidf = {};
+    Object.keys(doc).forEach((word) => {
+      const tf = doc[word]; // Term Frequency
+      const idf = Math.log(documentCount / (df[word] || 1)); // Inverse Document Frequency
+      tfidf[word] = tf * idf;
+    });
+    return tfidf;
+  });
+};
+
 // Function to tokenize and count word frequencies
 const tokenizeAndVectorize = (text) => {
   const words = text.toLowerCase().match(/\b[a-z0-9]+\b/g) || [];
