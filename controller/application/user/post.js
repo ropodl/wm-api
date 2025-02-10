@@ -168,11 +168,11 @@ export const getSimilarPosts = async (req, res) => {
     // Pagination logic
     // const totalItems = similarPosts.length;
     // const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const offset = (page - 1) * itemsPerPage;
-    const paginatedPosts = similarPosts.slice(offset, offset + itemsPerPage);
+    // const offset = (page - 1) * itemsPerPage;
+    // const paginatedPosts = similarPosts.slice(offset, offset + itemsPerPage);
 
     res.json({
-      posts: paginatedPosts,
+      posts: similarPosts,
       // pagination: {
       //   totalItems,
       //   totalPages,
