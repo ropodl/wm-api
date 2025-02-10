@@ -51,36 +51,6 @@ export const slug = async (req, res) => {
   res.json(post);
 };
 
-// const cosineSimilarity = (userInterests, postTags) => {
-//   // Create a set of all unique interest IDs in both arrays
-//   const allInterests = new Set([...userInterests, ...postTags]);
-
-//   // Convert interests and tags into binary vectors
-//   const userVector = Array.from(allInterests).map((interestId) =>
-//     userInterests.includes(interestId) ? 1 : 0
-//   );
-//   const postVector = Array.from(allInterests).map((interestId) =>
-//     postTags.includes(interestId) ? 1 : 0
-//   );
-
-//   // Calculate dot product and magnitudes of the vectors
-//   const dotProduct = userVector.reduce(
-//     (sum, val, i) => sum + val * postVector[i],
-//     0
-//   );
-//   const userMagnitude = Math.sqrt(
-//     userVector.reduce((sum, val) => sum + val * val, 0)
-//   );
-//   const postMagnitude = Math.sqrt(
-//     postVector.reduce((sum, val) => sum + val * val, 0)
-//   );
-
-//   // Calculate cosine similarity
-//   return userMagnitude && postMagnitude
-//     ? dotProduct / (userMagnitude * postMagnitude)
-//     : 0;
-// };
-
 export const recommendation = async (req, res) => {
   const { tenant_id } = req.headers;
   const { page = 1, itemsPerPage = 10 } = req.query;
