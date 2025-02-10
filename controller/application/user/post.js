@@ -162,22 +162,23 @@ export const getSimilarPosts = async (req, res) => {
       })
       .filter(Boolean) // Remove nulls
       .filter((post) => post.similarity > 0) // Remove non-similar posts
-      .sort((a, b) => b.similarity - a.similarity); // Sort by similarity
+      .sort((a, b) => b.similarity - a.similarity)
+      .splice(0, 4);
 
     // Pagination logic
-    const totalItems = similarPosts.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    // const totalItems = similarPosts.length;
+    // const totalPages = Math.ceil(totalItems / itemsPerPage);
     const offset = (page - 1) * itemsPerPage;
     const paginatedPosts = similarPosts.slice(offset, offset + itemsPerPage);
 
     res.json({
       posts: paginatedPosts,
-      pagination: {
-        totalItems,
-        totalPages,
-        itemsPerPage: parseInt(itemsPerPage),
-        currentPage: parseInt(page),
-      },
+      // pagination: {
+      //   totalItems,
+      //   totalPages,
+      //   itemsPerPage: parseInt(itemsPerPage),
+      //   currentPage: parseInt(page),
+      // },
     });
   } catch (error) {
     console.error(error);
