@@ -161,7 +161,7 @@ export const getSimilarPosts = async (req, res) => {
         };
       })
       .filter(Boolean) // Remove nulls
-      .filter((post) => post.similarity > 0.025) // Remove non-similar posts
+      .filter((post) => post.similarity > 0.055) // Remove non-similar posts
       .sort((a, b) => b.similarity - a.similarity)
       .splice(0, 4);
 
