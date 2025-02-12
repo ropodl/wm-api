@@ -65,7 +65,7 @@ export const update = async (req, res) => {
 
   if (file)
     forum.image = {
-      url: imgUrl,
+      url: imgUrl(req, res, file),
       name: file.filename,
     };
 
