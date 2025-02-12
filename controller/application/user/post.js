@@ -115,7 +115,7 @@ export const recommendation = async (req, res) => {
 export const getSimilarPosts = async (req, res) => {
   const { tenant_id } = req.headers;
   const { id } = req.params;
-  const { page = 1, itemsPerPage = 10 } = req.query;
+  // const { page = 1, itemsPerPage = 10 } = req.query;
 
   const tenantdb = await getTenantDB(tenant_id);
   const tenantPost = tenantdb.model("post", postSchema);
